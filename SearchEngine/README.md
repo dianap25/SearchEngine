@@ -12,6 +12,26 @@ Do poprawnej kompilacji projektu wymagane są:
 
 ### Instalacja zależności
 
-#### macOS (używając Homebrew)
 ```bash
-brew install cmake sqlite googletest
+sudo apt update
+sudo apt install cmake g++ libsqlite3-dev libgtest-dev
+```
+
+
+
+### Uruchomienie aplikacji
+
+```bash
+mkdir build
+cd build
+cmake ..
+make
+./searchengine
+```
+
+
+### Uruchomienie testów
+
+```bash
+ctest --output-on-failure
+```
