@@ -10,7 +10,7 @@ void Application::run() {
     database.open("index.db");
 
     Scanner scanner;
-    scanner.scan();
+    scanner.scan("../sample_data");
 
     SearchEngine searchEngine;
     searchEngine.search();
