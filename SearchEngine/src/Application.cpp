@@ -1,19 +1,24 @@
 #include "Application.h"
 #include "Database.h"
-#include "Scanner.h"
 #include "SearchEngine.h"
 
 #include <iostream>
 
 void Application::run() {
     Database database;
-    database.open("index.db");
 
-    Scanner scanner;
-    scanner.scan("../sample_data");
+    if (!database.open("index.db")) {
+        std::cerr << "Could not open database\n";
+        return;
+    }
+
+    if (!database.initializeSchema()) {
+        std::cerr << "Could not initialize database schema\n";
+        return;
+    }
 
     SearchEngine searchEngine;
-    searchEngine.search();
+    searchEngine.search("../sample_data", "example");
 
     std::cout << "Application skeleton started successfully.\n";
 }
