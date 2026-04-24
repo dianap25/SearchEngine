@@ -16,5 +16,7 @@ public:
     bool initializeSchema();
 
 private:
+    bool executeSql(const std::string& sql);
+
     sqlite3* db_ = nullptr;
 };
