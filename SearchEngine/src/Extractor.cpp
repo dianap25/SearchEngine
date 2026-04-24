@@ -1,3 +1,6 @@
+//Alesia Filinkova
+//Diana Pelin
+
 #include "Extractor.h"
 #include <fstream>
 #include <sstream>

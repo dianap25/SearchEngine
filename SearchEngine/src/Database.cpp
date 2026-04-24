@@ -1,3 +1,6 @@
+//Alesia Filinkova
+//Diana Pelin
+
 #include "Database.h"
 
 #include <sqlite3.h>

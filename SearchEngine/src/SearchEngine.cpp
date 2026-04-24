@@ -1,6 +1,10 @@
+//Alesia Filinkova
+//Diana Pelin
+
 #include "SearchEngine.h"
 #include "Scanner.h"
 #include "Extractor.h"
+#include "FileMetadata.h"
 
 #include <iostream>
 #include <vector>
@@ -9,10 +13,10 @@ void SearchEngine::search(const std::string& rootPath, const std::string& phrase
     Scanner scanner;
     Extractor extractor;
 
-    std::vector<std::string> files = scanner.scan(rootPath);
+    std::vector<FileMetadata> files = scanner.scan(rootPath);
 
-    for (const std::string& filePath : files) {
-        std::string content = extractor.extract(filePath);
+    for (const FileMetadata& file : files) {
+        std::string content = extractor.extract(file.path);
 
         if (content.empty()) {
             continue;
@@ -20,7 +24,9 @@ void SearchEngine::search(const std::string& rootPath, const std::string& phrase
 
         if (content.find(phrase) != std::string::npos) {
             std::string context = buildContext(content, phrase);
-            std::cout << "Found in file: " << filePath << "\n";
+            std::cout << "Found in file: " << file.path << "\n";
+            std::cout << "Size: " << file.size << " bytes\n";
+            std::cout << "Modified time: " << file.modifiedTime << "\n";
             std::cout << "Context: " << context << "\n\n";
         }
     }

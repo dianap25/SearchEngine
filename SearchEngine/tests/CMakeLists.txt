@@ -3,8 +3,10 @@ find_package(GTest REQUIRED)
 add_executable(unit_tests
     test_database.cpp
     test_extractor.cpp
+    test_scanner.cpp
     ../src/Database.cpp
     ../src/Extractor.cpp
+    ../src/Scanner.cpp
 )
 
 target_include_directories(unit_tests PRIVATE ../include)
