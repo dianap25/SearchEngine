@@ -9,12 +9,14 @@ Do poprawnej kompilacji projektu wymagane są:
 * **Kompilator C++** (g++ lub Apple Clang)
 * **SQLite3**
 * **GoogleTest (GTest)**
+* **Poppler-utils (for pdftotext)**
+
 
 ### Instalacja zależności
 
 ```bash
 sudo apt update
-sudo apt install cmake g++ libsqlite3-dev libgtest-dev
+sudo apt install cmake g++ libsqlite3-dev libgtest-dev poppler-utils
 ```
 
 
