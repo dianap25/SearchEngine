@@ -4,9 +4,14 @@ add_executable(unit_tests
     test_database.cpp
     test_extractor.cpp
     test_scanner.cpp
+    test_repository.cpp
+    test_indexer.cpp
+
     ../src/Database.cpp
     ../src/Extractor.cpp
     ../src/Scanner.cpp
+    ../src/Repository.cpp
+    ../src/Indexer.cpp
 )
 
 target_include_directories(unit_tests PRIVATE ../include)

@@ -115,3 +115,7 @@ bool Database::executeSql(const std::string& sql) {
 
     return true;
 }
+
+sqlite3* Database::connection() {
+    return db_;
+}
