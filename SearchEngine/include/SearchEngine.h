@@ -1,3 +1,5 @@
+//Alesia Filinkova
+//Diana Pelin
 #pragma once
 
 #include <string>
