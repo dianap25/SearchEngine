@@ -1,0 +1,63 @@
+//Alesia Filinkova
+//Diana Pelin
+
+#include <gtest/gtest.h>
+
+#include "Database.h"
+#include "Indexer.h"
+#include "Repository.h"
+
+#include <cstdio>
+#include <string>
+#include <vector>
+
+TEST(IndexerTest, TokenizesAndNormalizesContent) {
+    Database database;
+    ASSERT_TRUE(database.open(":memory:"));
+    ASSERT_TRUE(database.initializeSchema());
+
+    Repository repository(database.connection());
+    Indexer indexer(repository);
+
+    std::vector<std::pair<std::string, int>> tokens =
+        indexer.tokenize("Hello, WORLD! hello.");
+
+    ASSERT_EQ(tokens.size(), 3);
+
+    EXPECT_EQ(tokens[0].first, "hello");
+    EXPECT_EQ(tokens[0].second, 0);
+
+    EXPECT_EQ(tokens[1].first, "world");
+    EXPECT_EQ(tokens[1].second, 1);
+
+    EXPECT_EQ(tokens[2].first, "hello");
+    EXPECT_EQ(tokens[2].second, 2);
+}
+
+TEST(IndexerTest, SavesTokensToDatabase) {
+    Database database;
+    ASSERT_TRUE(database.open(":memory:"));
+    ASSERT_TRUE(database.initializeSchema());
+
+    Repository repository(database.connection());
+    Indexer indexer(repository);
+
+    FileMetadata metadata;
+    metadata.path = "sample.txt";
+    metadata.name = "sample.txt";
+    metadata.extension = ".txt";
+    metadata.size = 20;
+    metadata.modifiedTime = 100;
+
+    int fileId = repository.saveFileMetadata(metadata);
+    ASSERT_GT(fileId, 0);
+
+    ASSERT_TRUE(repository.saveFileText(fileId, "hello world hello"));
+    ASSERT_TRUE(indexer.indexFile(fileId, "hello world hello"));
+
+    std::vector<SearchResult> results = repository.searchByContent("hello");
+
+    ASSERT_EQ(results.size(), 1);
+    EXPECT_EQ(results[0].name, "sample.txt");
+    EXPECT_EQ(results[0].occurrences, 2);
+}

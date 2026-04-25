@@ -1,10 +1,20 @@
+//Alesia Filinkova
+//Diana Pelin
+
 #pragma once
-#include <vector>
+
+#include "FileMetadata.h"
+
+#include <filesystem>
 #include <string>
+#include <vector>
 
 class Scanner {
 public:
-    std::vector<std::string> scan(const std::string& path);
+    std::vector<FileMetadata> scan(const std::string& rootPath);
+
 private:
-    bool isSupported(const std::string& path);
+    bool isSupported(const std::filesystem::path& path) const;
+    FileMetadata buildMetadata(const std::filesystem::directory_entry& entry) const;
+    std::int64_t toUnixTimestamp(const std::filesystem::file_time_type& fileTime) const;
 };

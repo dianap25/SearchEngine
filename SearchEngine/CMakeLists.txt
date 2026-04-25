@@ -16,6 +16,8 @@ add_executable(searchengine
     src/Extractor.cpp
     src/Scanner.cpp
     src/SearchEngine.cpp
+    src/Repository.cpp
+    src/Indexer.cpp
 )
 
 target_include_directories(searchengine PRIVATE include)

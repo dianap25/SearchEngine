@@ -1,3 +1,6 @@
+//Alesia Filinkova
+//Diana Pelin
+
 #include "Application.h"
 
 int main() {

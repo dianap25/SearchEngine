@@ -1,3 +1,6 @@
+//Alesia Filinkova
+//Diana Pelin
+
 #pragma once
 
 #include <string>
@@ -12,6 +15,10 @@ public:
     bool open(const std::string& path);
     bool initializeSchema();
 
+    sqlite3* connection();
+
 private:
+    bool executeSql(const std::string& sql);
+
     sqlite3* db_ = nullptr;
 };
