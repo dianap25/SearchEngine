@@ -5,5 +5,9 @@
 
 class Application {
 public:
-    void run();
+    int run(int argc, char** argv);
+
+private:
+    int runIndexCommand(const char* directoryPath);
+    void printUsage() const;
 };

@@ -25,6 +25,7 @@ public:
     bool saveTermPosition(int fileId, const std::string& term, int position);
 
     std::optional<FileMetadata> findByPath(const std::string& path);
+    std::optional<std::string> findTextByPath(const std::string& path);
     std::vector<FileMetadata> findAllFiles();
 
     bool deleteFileByPath(const std::string& path);

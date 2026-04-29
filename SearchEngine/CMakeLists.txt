@@ -13,11 +13,11 @@ add_executable(searchengine
     src/main.cpp
     src/Application.cpp
     src/Database.cpp
-    src/Extractor.cpp
     src/Scanner.cpp
-    src/SearchEngine.cpp
+    src/Extractor.cpp
     src/Repository.cpp
     src/Indexer.cpp
+    src/IndexService.cpp
 )
 
 target_include_directories(searchengine PRIVATE include)

@@ -3,8 +3,7 @@
 
 #include "Application.h"
 
-int main() {
-    Application app;
-    app.run();
-    return 0;
+int main(int argc, char** argv) {
+    Application application;
+    return application.run(argc, argv);
 }
