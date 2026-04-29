@@ -78,3 +78,40 @@ TEST(RepositoryTest, DeletesFileByPath) {
 
     EXPECT_FALSE(found.has_value());
 }
+
+TEST(RepositoryTest, FindsTextByPath) {
+    Database database;
+    ASSERT_TRUE(database.open(":memory:"));
+    ASSERT_TRUE(database.initializeSchema());
+
+    Repository repository(database.connection());
+
+    FileMetadata metadata;
+    metadata.path = "/tmp/content.txt";
+    metadata.name = "content.txt";
+    metadata.extension = ".txt";
+    metadata.size = 25;
+    metadata.modifiedTime = 100;
+
+    int fileId = repository.saveFileMetadata(metadata);
+    ASSERT_GT(fileId, 0);
+
+    ASSERT_TRUE(repository.saveFileText(fileId, "hello world from database"));
+
+    std::optional<std::string> text = repository.findTextByPath("/tmp/content.txt");
+
+    ASSERT_TRUE(text.has_value());
+    EXPECT_EQ(text.value(), "hello world from database");
+}
+
+TEST(RepositoryTest, ReturnsEmptyOptionalWhenTextDoesNotExist) {
+    Database database;
+    ASSERT_TRUE(database.open(":memory:"));
+    ASSERT_TRUE(database.initializeSchema());
+
+    Repository repository(database.connection());
+
+    std::optional<std::string> text = repository.findTextByPath("/tmp/missing.txt");
+
+    EXPECT_FALSE(text.has_value());
+}

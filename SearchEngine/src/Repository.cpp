@@ -217,6 +217,39 @@ std::optional<FileMetadata> Repository::findByPath(const std::string& path) {
     return result;
 }
 
+std::optional<std::string> Repository::findTextByPath(const std::string& path) {
+    const char* sql = R"(
+        SELECT ft.content
+        FROM files f
+        JOIN file_texts ft ON ft.file_id = f.id
+        WHERE f.path = ?;
+    )";
+
+    sqlite3_stmt* statement = nullptr;
+
+    if (sqlite3_prepare_v2(db_, sql, -1, &statement, nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to prepare findTextByPath statement: "
+                  << sqlite3_errmsg(db_)
+                  << "\n";
+        return std::nullopt;
+    }
+
+    sqlite3_bind_text(statement, 1, path.c_str(), -1, SQLITE_TRANSIENT);
+
+    std::optional<std::string> result = std::nullopt;
+
+    if (sqlite3_step(statement) == SQLITE_ROW) {
+        const unsigned char* text = sqlite3_column_text(statement, 0);
+
+        if (text != nullptr) {
+            result = reinterpret_cast<const char*>(text);
+        }
+    }
+
+    sqlite3_finalize(statement);
+    return result;
+}
+
 std::vector<FileMetadata> Repository::findAllFiles() {
     const char* sql = R"(
         SELECT path, name, extension, size, modified_time
