@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include_directories(include)
 
 find_package(SQLite3 REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 add_executable(searchengine
     src/main.cpp
@@ -18,10 +19,14 @@ add_executable(searchengine
     src/Repository.cpp
     src/Indexer.cpp
     src/IndexService.cpp
+    src/SearchEngine.cpp
+    src/RefreshEngine.cpp
+    src/Hasher.cpp
 )
 
 target_include_directories(searchengine PRIVATE include)
 target_link_libraries(searchengine PRIVATE SQLite::SQLite3)
+target_link_libraries(searchengine PRIVATE crypto ssl)
 
 enable_testing()
 add_subdirectory(tests)

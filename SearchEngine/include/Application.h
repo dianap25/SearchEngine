@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <string>
+
 class Application {
 public:
     int run(int argc, char** argv);

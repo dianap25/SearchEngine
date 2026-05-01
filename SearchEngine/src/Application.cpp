@@ -117,7 +117,7 @@ int Application::handleRefresh(const std::string& path) {
     if (!db.open("index.db")) return 1;
 
     RefreshEngine engine;
-    engine.rebuild(path, db);
+    engine.refresh(path, db);
 
     std::cout << "Refresh completed\n";
     return 0;

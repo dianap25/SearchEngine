@@ -8,5 +8,5 @@
 
 class RefreshEngine {
 public:
-    void rebuild(const std::string& rootPath, Database& db);
+    void refresh(const std::string& rootPath, Database& db);
 };
