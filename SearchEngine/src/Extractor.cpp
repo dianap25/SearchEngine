@@ -4,23 +4,44 @@
 #include "Extractor.h"
 #include <fstream>
 #include <sstream>
-#include <cstdlib>
+#include <filesystem>
 
-std::string Extractor::extract(const std::string& filePath) {
-    if (filePath.size() >= 4 && filePath.substr(filePath.size() - 4) == ".pdf") {
+namespace fs = std::filesystem;
+
+ExtractResult Extractor::extract(const std::string& filePath) {
+    if (!fs::exists(filePath)) {
+        return ExtractResult::fail("File does not exist");
+    }
+
+    if (filePath.size() >= 4 &&
+        filePath.substr(filePath.size() - 4) == ".pdf") {
+
         return extractPdf(filePath);
     }
+
     return extractText(filePath);
 }
 
-std::string Extractor::extractText(const std::string& filePath) {
+ExtractResult Extractor::extractText(const std::string& filePath) {
     std::ifstream file(filePath);
+
+    if (!file.is_open()) {
+        return ExtractResult::fail("Cannot open text file");
+    }
+
     std::stringstream buffer;
     buffer << file.rdbuf();
-    return buffer.str();
+
+    std::string content = buffer.str();
+
+    if (content.empty()) {
+        return ExtractResult::fail("Empty text file");
+    }
+
+    return ExtractResult::ok(content);
 }
 
-std::string Extractor::extractPdf(const std::string& filePath) {
+std::string Extractor::extractPdfInternal(const std::string& filePath) {
     std::string command = "pdftotext '" + filePath + "' -";
     std::string result;
     char buffer[256];
@@ -33,4 +54,14 @@ std::string Extractor::extractPdf(const std::string& filePath) {
     }
     pclose(pipe);
     return result;
+}
+
+ExtractResult Extractor::extractPdf(const std::string& filePath) {
+    std::string result = extractPdfInternal(filePath);
+
+    if (result.empty()) {
+        return ExtractResult::fail("PDF extraction returned empty content");
+    }
+
+    return ExtractResult::ok(result);
 }

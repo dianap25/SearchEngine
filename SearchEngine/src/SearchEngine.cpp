@@ -16,7 +16,17 @@ void SearchEngine::search(const std::string& rootPath, const std::string& phrase
     std::vector<FileMetadata> files = scanner.scan(rootPath);
 
     for (const FileMetadata& file : files) {
-        std::string content = extractor.extract(file.path);
+        ExtractResult result = extractor.extract(file.path);
+
+        if (!result.success) {
+            std::cerr << "[Extractor ERROR] "
+                      << file.path << " -> "
+                      << result.errorMessage << "\n";
+
+            continue;
+        }
+
+    std::string content = result.content;
 
         if (content.empty()) {
             continue;

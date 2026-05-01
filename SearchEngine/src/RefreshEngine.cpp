@@ -11,6 +11,7 @@
 
 #include <unordered_map>
 #include <unordered_set>
+#include <iostream>
 
 void RefreshEngine::refresh(const std::string& rootPath, Database& db) {
     Scanner scanner;
@@ -33,8 +34,14 @@ void RefreshEngine::refresh(const std::string& rootPath, Database& db) {
 
     for (const auto& fsFile : fsFiles) {
         seen.insert(fsFile.path);
+        ExtractResult result = extractor.extract(fsFile.path);
+        if (!result.success) {
+            std::cerr << "[SKIP] " << fsFile.path
+                      << " -> " << result.errorMessage << "\n";
+            continue;
+        }
 
-        std::string content = extractor.extract(fsFile.path);
+        std::string content = result.content;
         std::string hash = Hasher::sha256(content);
 
         auto it = dbMap.find(fsFile.path);
@@ -44,7 +51,6 @@ void RefreshEngine::refresh(const std::string& rootPath, Database& db) {
             meta.contentHash = hash;
 
             int fileId = repo.saveFileMetadata(meta);
-
             repo.saveFileText(fileId, content);
             indexer.indexFile(fileId, content);
 
@@ -53,12 +59,9 @@ void RefreshEngine::refresh(const std::string& rootPath, Database& db) {
 
         FileMetadata& dbFile = it->second;
         if (dbFile.contentHash != hash) {
-
             repo.deleteIndexForFile(dbFile.id);
-
             repo.saveFileText(dbFile.id, content);
             indexer.indexFile(dbFile.id, content);
-
             dbFile.contentHash = hash;
         }
     }

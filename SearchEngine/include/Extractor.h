@@ -2,12 +2,14 @@
 //Diana Pelin
 
 #pragma once
+#include "ExtractResult.h"
 #include <string>
 
 class Extractor {
 public:
-    std::string extract(const std::string& filePath);
+    ExtractResult extract(const std::string& filePath);
 private:
-    std::string extractText(const std::string& filePath);
-    std::string extractPdf(const std::string& filePath);
+    ExtractResult extractText(const std::string& filePath);
+    ExtractResult extractPdf(const std::string& filePath);
+    std::string extractPdfInternal(const std::string& filePath);
 };

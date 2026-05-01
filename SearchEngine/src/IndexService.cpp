@@ -7,6 +7,7 @@
 #include "Indexer.h"
 #include "Repository.h"
 #include "Scanner.h"
+#include "ExtractResult.h"
 
 #include <iostream>
 #include <vector>
@@ -27,7 +28,9 @@ IndexSummary IndexService::indexDirectory(const std::string& rootPath) {
     summary.scannedFiles = static_cast<int>(files.size());
 
     for (const FileMetadata& file : files) {
-        std::string content = extractor.extract(file.path);
+        ExtractResult result = extractor.extract(file.path);
+            if (!result.success) continue;
+        std::string content = result.content;
 
         if (content.empty()) {
             std::cerr << "Skipped empty or unreadable file: " << file.path << "\n";
