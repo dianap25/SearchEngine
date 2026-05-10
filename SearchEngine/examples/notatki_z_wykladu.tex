@@ -1,0 +1,31 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\begin{document}
+
+\section*{Notatki z wykladu -- granice ciagow}
+
+Mowimy, ze ciag $(a_n)$ ma granice $g$, gdy dla kazdego $\varepsilon > 0$
+istnieje takie $N$, ze dla wszystkich $n > N$ zachodzi
+$|a_n - g| < \varepsilon$. Piszemy wtedy $\lim_{n \to \infty} a_n = g$.
+
+\subsection*{Twierdzenie o trzech ciagach}
+
+Jezeli $a_n \leq b_n \leq c_n$ dla prawie wszystkich $n$ oraz
+$\lim a_n = \lim c_n = g$, to rowniez $\lim b_n = g$.
+
+\subsection*{Przyklady}
+
+\begin{enumerate}
+  \item $\lim_{n \to \infty} \frac{1}{n} = 0$
+  \item $\lim_{n \to \infty} \left(1 + \frac{1}{n}\right)^n = e$
+  \item $\lim_{n \to \infty} \sqrt[n]{n} = 1$
+\end{enumerate}
+
+\subsection*{Cwiczenia}
+
+Pokaz, ze ciag $a_n = \frac{n^2 + 3n}{2n^2 - 1}$ jest zbiezny i wyznacz
+jego granice. Wskazowka: podziel licznik i mianownik przez $n^2$.
+
+\end{document}

@@ -1,0 +1,47 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Raport z projektu SearchEngine}
+\author{Zespol ZPR}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Niniejszy dokument opisuje architekture lokalnej wyszukiwarki plikow
+napisanej w jezyku C++17 z wykorzystaniem biblioteki SQLite. System
+wspiera indeksowanie inkrementalne, wyszukiwanie po nazwie pliku oraz
+po jego tresci, a takze wyciaganie krotkich fragmentow kontekstu
+wokol znalezionej frazy.
+\end{abstract}
+
+\section{Architektura}
+
+Aplikacja sklada sie z nastepujacych warstw:
+
+\begin{itemize}
+  \item Scanner -- przegladanie systemu plikow,
+  \item Extractor -- wyciaganie tresci tekstowej (txt, tex, pdf),
+  \item Repository -- dostep do bazy SQLite,
+  \item Indexer -- budowa indeksu odwroconego,
+  \item RefreshEngine -- aktualizacja inkrementalna oparta na SHA-256,
+  \item ContextBuilder -- generowanie fragmentu wokol frazy,
+  \item Application -- warstwa CLI.
+\end{itemize}
+
+\section{Testowanie}
+
+Projekt zawiera 41 testow jednostkowych pokrywajacych kazdy z modulow.
+Testy uruchamiane sa przez ctest i wszystkie aktualnie przechodza.
+Pojedynczy test ekstrakcji PDF jest pomijany w srodowiskach bez
+narzedzia pdftotext.
+
+\section{Przyklad uzycia}
+
+\begin{verbatim}
+./searchengine index ../examples
+./searchengine search-content algorytm
+./searchengine refresh ../examples
+\end{verbatim}
+
+\end{document}
