@@ -21,7 +21,6 @@ add_executable(searchengine
     src/Repository.cc
     src/Indexer.cc
     src/IndexService.cc
-    src/SearchEngine.cc
     src/RefreshEngine.cc
     src/Hasher.cc
     src/ContextBuilder.cc
