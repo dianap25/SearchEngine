@@ -124,17 +124,18 @@ Cały kod ma komentarze w formacie Doxygen (bloki `@brief`, `@param`, `@return` 
 
 #### Instalacja zależności
 
+Linux (Debian / Ubuntu):
+
+```bash
+sudo apt install doxygen graphviz
+```
+
 macOS (Homebrew):
 
 ```bash
 brew install doxygen graphviz
 ```
 
-Linux (Debian / Ubuntu):
-
-```bash
-sudo apt install doxygen graphviz
-```
 
 ### Generowanie
 
