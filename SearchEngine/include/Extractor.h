@@ -1,8 +1,8 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Abstrakcyjna baza hierarchii ekstraktorów (wzorzec strategii).
-// Konkretne podklasy (TextExtractor, PdfExtractor) wpinają się do
-// jednego dyspozytora (ExtractorFactory), który dobiera odpowiednią
-// strategię na podstawie rozszerzenia pliku.
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Abstract base of the extractor hierarchy (Strategy
+// pattern). Concrete subclasses (TextExtractor, PdfExtractor) plug
+// into a single dispatcher (ExtractorFactory) that picks the right
+// strategy based on the file extension.
 
 #pragma once
 
@@ -11,16 +11,16 @@
 #include <string>
 
 /**
- * @brief Interfejs strategii czytającej zawartość tekstową z pliku.
+ * @brief Strategy interface for reading textual content from a file.
  */
 class Extractor {
 public:
     virtual ~Extractor() = default;
 
     /**
-     * @brief Ekstrahuje treść tekstową z pliku @p file_path.
-     * @param file_path Ścieżka do pliku na dysku.
-     * @return Wydobyta treść albo wynik niepowodzenia.
+     * @brief Extracts textual content from @p file_path.
+     * @param file_path Path to the file on disk.
+     * @return Extracted content or a failure result.
      */
     virtual ExtractResult extract(const std::string& file_path) const = 0;
 };

@@ -1,4 +1,7 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of RefreshEngine. Compares filesystem
+// state with the database (matched by SHA-256 of content) and
+// inserts, re-indexes or removes records to keep them in sync.
 
 
 #include "RefreshEngine.h"

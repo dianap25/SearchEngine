@@ -1,4 +1,8 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of the Database RAII wrapper. Opens a
+// SQLite connection through std::unique_ptr with a custom deleter,
+// creates the index schema and runs the lightweight content_hash
+// migration.
 
 
 #include "Database.h"
@@ -104,10 +108,10 @@ bool Database::initializeSchema() {
         return false;
     }
 
-    // Lekka migracja dla starszych baz, które powstały zanim
-    // pojawiła się kolumna content_hash. Gdy kolumna już istnieje,
-    // SQLite zwraca SQLITE_ERROR z komunikatem "duplicate column
-    // name"; ten przypadek świadomie ignorujemy.
+    // Lightweight migration for older databases that were created
+    // before the content_hash column existed. When the column is
+    // already there, SQLite returns SQLITE_ERROR with a "duplicate
+    // column name" message; that case is intentionally ignored.
     char* alter_error = nullptr;
     int alter_rc = sqlite3_exec(
         db_.get(),

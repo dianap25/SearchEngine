@@ -1,7 +1,7 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Struktura danych opisująca pojedynczy plik na dysku oraz
-// stan, jaki o tym pliku przechowuje indeks (id w bazie, hash
-// zawartości).
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Data structure describing a single file on disk plus
+// the state the index keeps about that file (database id, content
+// hash).
 
 #pragma once
 
@@ -9,13 +9,12 @@
 #include <string>
 
 /**
- * @brief Migawka pliku w postaci, w jakiej istnieje na dysku oraz w
- *        indeksie.
+ * @brief Snapshot of a file as it exists on disk and in the index.
  *
- * Scanner wypełnia pola pochodzące z dysku (path, name, extension,
- * size, modified_time). Repository wypełnia @c id i @c content_hash
- * z bazy danych. RefreshEngine porównuje hashe, aby zdecydować, czy
- * plik wymaga ponownej indeksacji.
+ * Scanner fills the disk-derived fields (path, name, extension, size,
+ * modified_time). Repository fills @c id and @c content_hash from the
+ * database. RefreshEngine compares hashes to decide whether a file
+ * needs to be re-indexed.
  */
 struct FileMetadata {
     int id = 0;

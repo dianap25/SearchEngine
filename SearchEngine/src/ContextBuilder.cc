@@ -1,4 +1,7 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of ContextBuilder, which cuts a
+// configurable text window around the first case-insensitive match
+// of the search phrase.
 
 
 #include "ContextBuilder.h"

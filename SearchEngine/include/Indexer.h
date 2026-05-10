@@ -1,7 +1,7 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Dzieli wydobyty tekst na
-// znormalizowane termy wraz z ich pozycjami i zapisuje je przez
-// Repository, tak aby search-content mogło je później odnaleźć.
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Splits extracted text into normalized terms with their
+// positions and writes them through Repository, so that search-content
+// can find them later.
 
 #pragma once
 
@@ -12,28 +12,27 @@
 #include <vector>
 
 /**
- * @brief Buduje indeks odwrócony dla pojedynczego pliku.
+ * @brief Builds the inverted index for a single file.
  *
- * Trzyma referencję do Repository, przez które zapisuje dane;
- * obiekt Repository musi przeżyć Indexer.
+ * Holds a reference to the Repository through which it persists data;
+ * the Repository object must outlive the Indexer.
  */
 class Indexer {
 public:
     explicit Indexer(Repository& repository);
 
     /**
-     * @brief Tokenizuje @p content i zapisuje wszystkie postingi
-     *        dla pliku.
-     * @param file_id Id pliku w bazie.
-     * @param content Wydobyty tekst pliku.
-     * @return true jeśli wszystkie postingi zostały zapisane
-     *         poprawnie.
+     * @brief Tokenizes @p content and writes every posting for the
+     *        file.
+     * @param file_id Database id of the file.
+     * @param content Extracted text of the file.
+     * @return true if every posting was persisted successfully.
      */
     bool indexFile(int file_id, const std::string& content);
 
     /**
-     * @brief Dzieli tekst na pary (znormalizowany term, pozycja).
-     * @param content Surowy wydobyty tekst.
+     * @brief Splits text into (normalized term, position) pairs.
+     * @param content Raw extracted text.
      */
     std::vector<std::pair<std::string, int>> tokenize(const std::string& content) const;
 

@@ -1,4 +1,7 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of PdfExtractor. Spawns pdftotext
+// through fork+execvp+pipe (no shell), reads its stdout into a
+// string and reports its exit status as an ExtractResult.
 
 
 #include "PdfExtractor.h"
@@ -16,13 +19,13 @@ namespace fs = std::filesystem;
 
 namespace {
 
-constexpr int kReadEnd = 0;
-constexpr int kWriteEnd = 1;
-constexpr std::size_t kBufferSize = 4096;
+constexpr int READ_END = 0;
+constexpr int WRITE_END = 1;
+constexpr std::size_t BUFFER_SIZE = 4096;
 
 ExtractResult readChildStdout(int fd) {
     std::string content;
-    char buffer[kBufferSize];
+    char buffer[BUFFER_SIZE];
 
     while (true) {
         ssize_t bytes = ::read(fd, buffer, sizeof(buffer));
@@ -62,22 +65,21 @@ ExtractResult PdfExtractor::extract(const std::string& file_path) const {
 
     pid_t pid = ::fork();
     if (pid < 0) {
-        ::close(pipe_fds[kReadEnd]);
-        ::close(pipe_fds[kWriteEnd]);
+        ::close(pipe_fds[READ_END]);
+        ::close(pipe_fds[WRITE_END]);
         return ExtractResult::fail(
             std::string("fork() failed: ") + std::strerror(errno));
     }
 
     if (pid == 0) {
-        // Proces potomny: przekierowuje stdout do potoku i uruchamia
-        // pdftotext.
-        ::close(pipe_fds[kReadEnd]);
-        if (::dup2(pipe_fds[kWriteEnd], STDOUT_FILENO) < 0) {
+        // Child process: redirect stdout to the pipe and exec pdftotext.
+        ::close(pipe_fds[READ_END]);
+        if (::dup2(pipe_fds[WRITE_END], STDOUT_FILENO) < 0) {
             ::_exit(127);
         }
-        ::close(pipe_fds[kWriteEnd]);
+        ::close(pipe_fds[WRITE_END]);
 
-        // pdftotext <file_path> -   (wypisuje tekst na stdout)
+        // pdftotext <file_path> -   (writes the text to stdout)
         std::string mutable_path = file_path;
         std::vector<char*> argv;
         argv.push_back(const_cast<char*>("pdftotext"));
@@ -89,11 +91,11 @@ ExtractResult PdfExtractor::extract(const std::string& file_path) const {
         ::_exit(127);
     }
 
-    // Proces nadrzędny: czyta stdout potomka, potem czeka na
-    // jego zakończenie.
-    ::close(pipe_fds[kWriteEnd]);
-    ExtractResult result = readChildStdout(pipe_fds[kReadEnd]);
-    ::close(pipe_fds[kReadEnd]);
+    // Parent process: read the child's stdout, then wait for it to
+    // exit.
+    ::close(pipe_fds[WRITE_END]);
+    ExtractResult result = readChildStdout(pipe_fds[READ_END]);
+    ::close(pipe_fds[READ_END]);
 
     int status = 0;
     while (::waitpid(pid, &status, 0) < 0) {

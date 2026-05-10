@@ -1,4 +1,6 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of TextExtractor. Reads .txt, .tex
+// and extension-less files directly from disk via std::ifstream.
 
 
 #include "TextExtractor.h"

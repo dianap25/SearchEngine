@@ -1,6 +1,6 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Fabryka mapująca ścieżkę pliku (po rozszerzeniu) na konkretną
-// strategię ekstrakcji, która potrafi go odczytać.
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Factory that maps a file path (by its extension) to
+// the concrete extraction strategy able to read it.
 
 #pragma once
 
@@ -10,19 +10,18 @@
 #include <string>
 
 /**
- * @brief Wybiera odpowiednią strategię ekstrakcji dla danej ścieżki
- *        pliku.
+ * @brief Picks the appropriate extraction strategy for a given file
+ *        path.
  */
 class ExtractorFactory {
 public:
     /**
-     * @brief Buduje ekstraktor na podstawie rozszerzenia ścieżki.
-     * @param file_path Ścieżka do pliku na dysku. Plik nie musi
-     *                  istnieć; brane pod uwagę jest tylko
-     *                  rozszerzenie.
-     * @return Wskaźnik własnościowy do konkretnego ekstraktora.
-     *         Pliki PDF dostają PdfExtractor; pozostałe (.txt, .tex,
-     *         brak rozszerzenia) dostają TextExtractor.
+     * @brief Builds an extractor based on the path extension.
+     * @param file_path Path to a file on disk. The file does not have
+     *                  to exist; only the extension is considered.
+     * @return Owning pointer to a concrete extractor. PDF files get a
+     *         PdfExtractor; everything else (.txt, .tex, no
+     *         extension) gets a TextExtractor.
      */
     static std::unique_ptr<Extractor> create(const std::string& file_path);
 };

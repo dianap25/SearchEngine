@@ -1,4 +1,7 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of Indexer. Tokenizes extracted text
+// into normalized terms with positions and hands the resulting
+// vector to Repository::saveTermPositionsBatch.
 
 
 #include "Indexer.h"

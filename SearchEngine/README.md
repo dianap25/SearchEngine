@@ -27,7 +27,7 @@ brew install cmake sqlite openssl googletest poppler
 
 ## Plik wejściowy projektu
 
-Punktem wejścia aplikacji jest plik [src/main.cpp](src/main.cpp). To w nim tworzona jest instancja klasy `Application` i wywoływana metoda `run()`. Cała logika obsługi poleceń znajduje się w [src/Application.cpp](src/Application.cpp).
+Punktem wejścia aplikacji jest plik [src/main.cc](src/main.cc). To w nim tworzona jest instancja klasy `Application` i wywoływana metoda `run()`. Cała logika obsługi poleceń znajduje się w [src/Application.cc](src/Application.cc).
 
 Po skompilowaniu projektu otrzymujemy plik wykonywalny `searchengine` w katalogu `build/`. To jego uruchamiamy z linii poleceń, podając odpowiednie polecenie jako argument.
 

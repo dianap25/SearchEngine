@@ -1,4 +1,8 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of IndexService, which scans a
+// directory, extracts text per file, hashes it and persists the
+// metadata, full text and inverted-index postings under a
+// per-file SQLite transaction.
 
 
 #include "IndexService.h"

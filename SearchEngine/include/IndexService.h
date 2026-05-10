@@ -1,7 +1,7 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Spina ze sobą Scanner, Extractor, Repository i Indexer pod jednym
-// punktem wejścia indexDirectory(), używanym przez polecenie CLI
-// "index".
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Wires Scanner, Extractor, Repository and Indexer
+// together behind a single indexDirectory() entry point used by the
+// CLI "index" command.
 
 #pragma once
 
@@ -11,19 +11,19 @@
 #include <string>
 
 /**
- * @brief Indeksuje każdy obsługiwany plik w katalogu w trybie
- *        "transakcja na plik".
+ * @brief Indexes every supported file in a directory using a
+ *        "transaction per file" strategy.
  */
 class IndexService {
 public:
     explicit IndexService(Database& database);
 
     /**
-     * @brief Przechodzi @p root_path, ekstrahuje treść i indeksuje
-     *        wszystko.
-     * @param root_path Katalog do przeskanowania rekurencyjnie.
-     * @return Liczniki opisujące przebieg (przeskanowane,
-     *         zaindeksowane, pominięte, błędne).
+     * @brief Walks @p root_path, extracts content and indexes
+     *        everything.
+     * @param root_path Directory to scan recursively.
+     * @return Counters describing the run (scanned, indexed, skipped,
+     *         failed).
      */
     IndexSummary indexDirectory(const std::string& root_path);
 

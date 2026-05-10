@@ -1,14 +1,12 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Liczniki zwracane przez IndexService::indexDirectory, dzięki
-// którym CLI może raportować ile plików zostało przeskanowanych,
-// zaindeksowanych, pominiętych lub uznanych za błędne podczas jednego
-// przebiegu indeksacji.
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Counters returned by IndexService::indexDirectory so
+// that the CLI can report how many files were scanned, indexed,
+// skipped or treated as failed during a single indexing run.
 
 #pragma once
 
 /**
- * @brief Zbiorcze liczniki zebrane podczas pojedynczego przebiegu
- *        indeksacji.
+ * @brief Aggregate counters collected during a single indexing run.
  */
 struct IndexSummary {
     int scanned_files = 0;

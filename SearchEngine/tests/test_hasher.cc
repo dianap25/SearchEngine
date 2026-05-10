@@ -1,5 +1,4 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
-
+// Authors: Alesia Filinkova, Diana Pelin
 
 #include <gtest/gtest.h>
 
@@ -7,14 +6,14 @@
 
 namespace {
 
-// Wzorcowy skrót SHA-256 pustego stringa zapisany w hex (małe litery).
-constexpr const char* kSha256Empty =
+// Reference SHA-256 digest of the empty string, in lowercase hex.
+constexpr const char* SHA256_EMPTY =
     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
 
 } // namespace
 
 TEST(HasherTest, EmptyStringMatchesReferenceDigest) {
-    EXPECT_EQ(Hasher::sha256(""), kSha256Empty);
+    EXPECT_EQ(Hasher::sha256(""), SHA256_EMPTY);
 }
 
 TEST(HasherTest, DigestIsDeterministic) {

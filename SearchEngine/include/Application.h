@@ -1,23 +1,22 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Parsuje argv, mapuje polecenia
-// (index/refresh/search-name/search-content) na odpowiednie usługi i
-// wyświetla informacje, gdy nie podano żadnego
-// polecenia.
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Parses argv, maps commands
+// (index/refresh/search-name/search-content) to the relevant services
+// and prints usage when no command is supplied.
 
 #pragma once
 
 #include <string>
 
 /**
- * @brief Punkt wejścia CLI aplikacji SearchEngine.
+ * @brief CLI entry point for the SearchEngine application.
  */
 class Application {
 public:
     /**
-     * @brief Uruchamia CLI z argumentami wiersza poleceń.
-     * @param argc Liczba argumentów argv.
-     * @param argv Argumenty wiersza poleceń.
-     * @return Kod wyjścia procesu.
+     * @brief Runs the CLI with the given command-line arguments.
+     * @param argc Number of arguments in argv.
+     * @param argv Command-line arguments.
+     * @return Process exit code.
      */
     int run(int argc, char** argv);
 

@@ -1,4 +1,7 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of Scanner. Walks a directory tree
+// recursively (skipping permission-denied entries) and produces a
+// FileMetadata record for every supported regular file.
 
 
 #include "Scanner.h"

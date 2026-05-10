@@ -1,4 +1,6 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Process entry point: builds an Application instance
+// and forwards argc/argv to Application::run.
 
 
 #include "Application.h"

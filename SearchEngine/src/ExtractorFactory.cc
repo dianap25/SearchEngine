@@ -1,4 +1,7 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of ExtractorFactory: returns a
+// PdfExtractor for .pdf paths and a TextExtractor for everything
+// else.
 
 
 #include "ExtractorFactory.h"

@@ -1,13 +1,14 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Wynik próby ekstrakcji tekstu (treść i komunikat diagnostyczny)
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Result of a text extraction attempt (content and
+// diagnostic error message).
 
 #pragma once
 
 #include <string>
 
 /**
- * @brief Wynik działania konkretnej implementacji Extractora na
- *        pliku.
+ * @brief Outcome of running a concrete Extractor implementation on a
+ *        single file.
  */
 struct ExtractResult {
     bool success = false;
@@ -15,16 +16,16 @@ struct ExtractResult {
     std::string error_message;
 
     /**
-     * @brief Buduje wynik oznaczający sukces.
-     * @param text Wydobyta treść tekstowa.
+     * @brief Builds a successful result.
+     * @param text Extracted plain text.
      */
     static ExtractResult ok(std::string text) {
         return {true, std::move(text), ""};
     }
 
     /**
-     * @brief Buduje wynik oznaczający niepowodzenie.
-     * @param error Czytelny dla człowieka opis błędu.
+     * @brief Builds a failure result.
+     * @param error Human-readable error description.
      */
     static ExtractResult fail(std::string error) {
         return {false, "", std::move(error)};

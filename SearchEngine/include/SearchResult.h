@@ -1,15 +1,15 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Struktura danych opisująca pojedyncze trafienie zwracane
-// przez Repository::searchByName / searchByContent i konsumowane
-// przez warstwę formatującą CLI.
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Data structure describing a single hit returned by
+// Repository::searchByName / searchByContent and consumed by the CLI
+// formatting layer.
 
 #pragma once
 
 #include <string>
 
 /**
- * @brief Pojedyncze trafienie zwracane przez wyszukiwanie po nazwie
- *        lub po treści.
+ * @brief A single hit returned by either name-based or
+ *        content-based search.
  */
 struct SearchResult {
     std::string path;

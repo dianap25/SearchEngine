@@ -1,4 +1,8 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of the Repository persistence layer
+// over the SQLite index schema (files, file_texts, terms, postings).
+// Provides metadata and posting writes plus name-based and
+// content-based search queries.
 
 
 #include "Repository.h"
@@ -117,43 +121,6 @@ bool Repository::saveFileText(int file_id, const std::string& content) {
     return success;
 }
 
-int Repository::findOrCreateTerm(const std::string& term) {
-    const char* insert_sql = R"(
-        INSERT INTO terms(term)
-        VALUES (?)
-        ON CONFLICT(term) DO NOTHING;
-    )";
-
-    sqlite3_stmt* insert_statement = nullptr;
-
-    if (sqlite3_prepare_v2(db_, insert_sql, -1, &insert_statement, nullptr) != SQLITE_OK) {
-        return -1;
-    }
-
-    sqlite3_bind_text(insert_statement, 1, term.c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_step(insert_statement);
-    sqlite3_finalize(insert_statement);
-
-    const char* select_sql = "SELECT id FROM terms WHERE term = ?;";
-
-    sqlite3_stmt* select_statement = nullptr;
-
-    if (sqlite3_prepare_v2(db_, select_sql, -1, &select_statement, nullptr) != SQLITE_OK) {
-        return -1;
-    }
-
-    sqlite3_bind_text(select_statement, 1, term.c_str(), -1, SQLITE_TRANSIENT);
-
-    int term_id = -1;
-
-    if (sqlite3_step(select_statement) == SQLITE_ROW) {
-        term_id = sqlite3_column_int(select_statement, 0);
-    }
-
-    sqlite3_finalize(select_statement);
-    return term_id;
-}
-
 bool Repository::saveTermPositionsBatch(
     int file_id,
     const std::vector<std::pair<std::string, int>>& tokens
@@ -258,40 +225,6 @@ bool Repository::saveTermPositionsBatch(
 
     cleanup();
     return true;
-}
-
-bool Repository::saveTermPosition(int file_id, const std::string& term, int position) {
-    int term_id = findOrCreateTerm(term);
-
-    if (term_id < 0) {
-        return false;
-    }
-
-    const char* sql = R"(
-        INSERT INTO postings(term_id, file_id, position)
-        VALUES (?, ?, ?);
-    )";
-
-    sqlite3_stmt* statement = nullptr;
-
-    if (sqlite3_prepare_v2(db_, sql, -1, &statement, nullptr) != SQLITE_OK) {
-        return false;
-    }
-
-    sqlite3_bind_int(statement, 1, term_id);
-    sqlite3_bind_int(statement, 2, file_id);
-    sqlite3_bind_int(statement, 3, position);
-
-    bool success = sqlite3_step(statement) == SQLITE_DONE;
-
-    if (!success) {
-        std::cerr << "Failed to save term position: "
-                  << sqlite3_errmsg(db_)
-                  << "\n";
-    }
-
-    sqlite3_finalize(statement);
-    return success;
 }
 
 std::optional<FileMetadata> Repository::findByPath(const std::string& path) {

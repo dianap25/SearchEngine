@@ -1,5 +1,5 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Warstwa dostępu do bazy. 
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Database access layer over the index schema.
 
 #pragma once
 
@@ -14,12 +14,12 @@
 struct sqlite3;
 
 /**
- * @brief Warstwa trwałości dla tabel files, file_texts, terms oraz
- *        postings.
+ * @brief Persistence layer for the files, file_texts, terms and
+ *        postings tables.
  *
- * Repository nie posiada na własność połączenia; to wywołujący
- * (zwykle właściciel klasy Database) gwarantuje, że uchwyt sqlite3*
- * przeżyje obiekt Repository.
+ * Repository does not own the connection; the caller (usually the
+ * Database owner) guarantees that the sqlite3* handle outlives the
+ * Repository object.
  */
 class Repository {
 public:
@@ -30,84 +30,67 @@ public:
     Repository(Repository&&) = default;
     Repository& operator=(Repository&&) = default;
 
-    /** @brief Rozpoczyna transakcję SQL. @return true jeśli się powiedzie. */
+    /** @brief Begins a SQL transaction. @return true on success. */
     bool beginTransaction();
-    /** @brief Zatwierdza otwartą transakcję SQL. */
+    /** @brief Commits the open SQL transaction. */
     bool commitTransaction();
-    /** @brief Wycofuje otwartą transakcję SQL. */
+    /** @brief Rolls back the open SQL transaction. */
     bool rollbackTransaction();
 
     /**
-     * @brief Wstawia lub aktualizuje wiersz w tabeli files.
-     * @param metadata Metadane pliku (id może być zerowe przy
-     *                 wstawianiu nowego rekordu).
-     * @return Liczbowe id wiersza albo -1 w razie niepowodzenia.
+     * @brief Inserts or updates a row in the files table.
+     * @param metadata File metadata (id may be zero when inserting a
+     *                 brand new record).
+     * @return Numeric row id, or -1 on failure.
      */
     int saveFileMetadata(const FileMetadata& metadata);
 
     /**
-     * @brief Zastępuje zapamiętany tekst pliku w cache.
-     * @param file_id Id pliku w bazie.
-     * @param content Wydobyty tekst do zapisania.
+     * @brief Replaces the cached extracted text for a file.
+     * @param file_id Database id of the file.
+     * @param content Extracted text to persist.
      */
     bool saveFileText(int file_id, const std::string& content);
 
     /**
-     * @brief Dopisuje pojedynczą parę (term, position) do postings.
+     * @brief Inserts every posting for a single file using prepared
+     *        statements and an in-memory term cache.
      *
-     * W przypadku zapisu większej liczby postingów warto użyć
-     * saveTermPositionsBatch — ta metoda przygotowuje dwa
-     * zapytania na każde wywołanie.
+     * The term-insert, term-select and posting-insert statements are
+     * prepared once; the method then iterates over @p tokens, binding,
+     * stepping and resetting each statement. Repeated terms in the
+     * same file are resolved through the in-memory cache, which
+     * removes the extra round-trip to the terms table.
      *
-     * @param file_id Id pliku w bazie.
-     * @param term Znormalizowany term.
-     * @param position Pozycja tokenu w pliku.
-     */
-    [[deprecated("Dla plików z większą liczbą tokenów użyj saveTermPositionsBatch.")]]
-    bool saveTermPosition(int file_id, const std::string& term, int position);
-
-    /**
-     * @brief Wstawia wszystkie postingi dla jednego pliku, używając
-     *        prepared statementów oraz cache'a termów dla danego
-     *        pliku.
-     *
-     * Przygotowuje statementy term-insert, term-select oraz
-     * posting-insert dokładnie raz, a następnie iteruje po wektorze
-     * @p tokens, bindując, wykonując i resetując każdy z nich.
-     * Powtórzone termy w tym samym pliku są rozwiązywane przez
-     * cache w pamięci, co eliminuje dodatkowe odpytywanie tabeli
-     * terms.
-     *
-     * @param file_id Id pliku w bazie.
-     * @param tokens Pary (znormalizowany term, pozycja) w kolejności
-     *               występowania w dokumencie.
-     * @return true jeśli każdy posting został zapisany poprawnie.
+     * @param file_id Database id of the file.
+     * @param tokens Pairs of (normalized term, position) in document
+     *               order.
+     * @return true if every posting was persisted successfully.
      */
     bool saveTermPositionsBatch(
         int file_id,
         const std::vector<std::pair<std::string, int>>& tokens
     );
 
-    /** @brief Wyszukuje metadane pliku po dokładnej ścieżce. */
+    /** @brief Looks up file metadata by exact path. */
     std::optional<FileMetadata> findByPath(const std::string& path);
-    /** @brief Wyszukuje wydobyty tekst po dokładnej ścieżce. */
+    /** @brief Looks up the extracted text by exact path. */
     std::optional<std::string> findTextByPath(const std::string& path);
-    /** @brief Zwraca metadane wszystkich aktualnie zaindeksowanych plików. */
+    /** @brief Returns metadata of every currently indexed file. */
     std::vector<FileMetadata> findAllFiles();
 
-    /** @brief Usuwa wiersz z tabeli files (kaskaduje na postings/file_texts). */
+    /** @brief Deletes a row from the files table (cascades to postings/file_texts). */
     bool deleteFileByPath(const std::string& path);
-    /** @brief Usuwa wszystkie postingi należące do jednego pliku. */
+    /** @brief Deletes every posting that belongs to a single file. */
     bool deleteIndexForFile(int file_id);
 
-    /** @brief Wyszukuje pliki po fragmencie nazwy (case-insensitive). */
+    /** @brief Searches files by a fragment of their name (case-insensitive). */
     std::vector<SearchResult> searchByName(const std::string& phrase);
-    /** @brief Wyszukuje pliki po dokładnym, znormalizowanym termie w treści. */
+    /** @brief Searches files by an exact, normalized term in their content. */
     std::vector<SearchResult> searchByContent(const std::string& term);
 
 private:
     bool executeSql(const std::string& sql);
-    int findOrCreateTerm(const std::string& term);
 
     sqlite3* db_;
 };

@@ -1,4 +1,4 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
 
 
 #include <gtest/gtest.h>
@@ -121,8 +121,8 @@ TEST_F(RefreshEngineFixture, SecondRefreshIsNoOpWhenNothingChanged) {
     std::int64_t indexed_at_before = indexedAtFor(a.string());
     ASSERT_GT(indexed_at_before, 0);
 
-    // Przesuń zegar, żeby ewentualny re-index podniósł indexed_at i
-    // żebyśmy mogli to wykryć.
+    // Advance the wall clock so that a re-index would bump
+    // indexed_at and we could detect it.
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
     RefreshEngine engine;
@@ -146,7 +146,7 @@ TEST_F(RefreshEngineFixture, ModifiedFileIsReIndexedTargetly) {
 
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
-    // Modyfikuj tylko a.txt.
+    // Modify only a.txt.
     {
         std::ofstream stream(a);
         stream << "alpha gamma";

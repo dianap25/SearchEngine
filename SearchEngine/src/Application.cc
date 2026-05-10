@@ -1,4 +1,7 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of the CLI dispatcher for the
+// SearchEngine application (index, refresh, search-name,
+// search-content).
 
 #include "Application.h"
 

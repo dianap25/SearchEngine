@@ -1,4 +1,7 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of Hasher::sha256, a thin wrapper
+// around the OpenSSL SHA256 routine that returns a lowercase
+// hexadecimal digest.
 
 
 #include "Hasher.h"

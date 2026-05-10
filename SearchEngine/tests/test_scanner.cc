@@ -1,4 +1,5 @@
-// Autorzy: Alesia Filinkova, Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+
 
 
 #include <gtest/gtest.h>
