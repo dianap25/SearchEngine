@@ -1,23 +1,26 @@
-//Alesia Filinkova
-//Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of Scanner. Walks the directory tree
+// with std::filesystem, filters by supported extensions and converts
+// the platform-dependent file_time_type into a Unix timestamp the
+// rest of the engine can store and compare.
 
 #include "Scanner.h"
 
 #include <chrono>
 #include <iostream>
 
-std::vector<FileMetadata> Scanner::scan(const std::string& rootPath) {
+std::vector<FileMetadata> Scanner::scan(const std::string& root_path) {
     std::vector<FileMetadata> files;
 
-    std::filesystem::path root(rootPath);
+    std::filesystem::path root(root_path);
 
     if (!std::filesystem::exists(root)) {
-        std::cerr << "Scan path does not exist: " << rootPath << "\n";
+        std::cerr << "Scan path does not exist: " << root_path << "\n";
         return files;
     }
 
     if (!std::filesystem::is_directory(root)) {
-        std::cerr << "Scan path is not a directory: " << rootPath << "\n";
+        std::cerr << "Scan path is not a directory: " << root_path << "\n";
         return files;
     }
 
@@ -66,18 +69,18 @@ FileMetadata Scanner::buildMetadata(const std::filesystem::directory_entry& entr
     metadata.name = path.filename().string();
     metadata.extension = path.extension().string();
     metadata.size = entry.file_size();
-    metadata.modifiedTime = toUnixTimestamp(entry.last_write_time());
+    metadata.modified_time = toUnixTimestamp(entry.last_write_time());
 
     return metadata;
 }
 
-std::int64_t Scanner::toUnixTimestamp(const std::filesystem::file_time_type& fileTime) const {
-    const auto systemTime = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
-        fileTime - std::filesystem::file_time_type::clock::now()
+std::int64_t Scanner::toUnixTimestamp(const std::filesystem::file_time_type& file_time) const {
+    const auto system_time = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+        file_time - std::filesystem::file_time_type::clock::now()
         + std::chrono::system_clock::now()
     );
 
     return std::chrono::duration_cast<std::chrono::seconds>(
-        systemTime.time_since_epoch()
+        system_time.time_since_epoch()
     ).count();
 }

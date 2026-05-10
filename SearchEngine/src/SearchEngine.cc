@@ -1,21 +1,25 @@
-//Alesia Filinkova
-//Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Legacy implementation of the directory-walking search.
+// Currently unreferenced and will be removed in a follow-up commit
+// when the CLI no longer needs the SearchEngine class.
 
 #include "SearchEngine.h"
+
 #include "ContextBuilder.h"
-#include "Scanner.h"
+#include "ExtractResult.h"
 #include "Extractor.h"
 #include "FileMetadata.h"
+#include "Scanner.h"
 
 #include <iostream>
 #include <vector>
 
-void SearchEngine::search(const std::string& rootPath, const std::string& phrase) {
+void SearchEngine::search(const std::string& root_path, const std::string& phrase) {
     Scanner scanner;
     Extractor extractor;
-    ContextBuilder contextBuilder;
+    ContextBuilder context_builder;
 
-    std::vector<FileMetadata> files = scanner.scan(rootPath);
+    std::vector<FileMetadata> files = scanner.scan(root_path);
 
     for (const FileMetadata& file : files) {
         ExtractResult result = extractor.extract(file.path);
@@ -23,7 +27,7 @@ void SearchEngine::search(const std::string& rootPath, const std::string& phrase
         if (!result.success) {
             std::cerr << "[Extractor ERROR] "
                       << file.path << " -> "
-                      << result.errorMessage << "\n";
+                      << result.error_message << "\n";
 
             continue;
         }
@@ -34,12 +38,12 @@ void SearchEngine::search(const std::string& rootPath, const std::string& phrase
             continue;
         }
 
-        std::string context = contextBuilder.build(content, phrase);
+        std::string context = context_builder.build(content, phrase);
 
         if (!context.empty()) {
             std::cout << "Found in file: " << file.path << "\n";
             std::cout << "Size: " << file.size << " bytes\n";
-            std::cout << "Modified time: " << file.modifiedTime << "\n";
+            std::cout << "Modified time: " << file.modified_time << "\n";
             std::cout << "Context: " << context << "\n\n";
         }
     }

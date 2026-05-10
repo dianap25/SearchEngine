@@ -1,5 +1,7 @@
-//Alesia Filinkova
-//Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Unit tests for Repository. Drive an in-memory SQLite
+// database through the public API and assert that file metadata,
+// extracted text and search-by-name behave as documented.
 
 #include <gtest/gtest.h>
 
@@ -18,11 +20,11 @@ TEST(RepositoryTest, SavesAndFindsFileByPath) {
     metadata.name = "example.txt";
     metadata.extension = ".txt";
     metadata.size = 123;
-    metadata.modifiedTime = 456;
+    metadata.modified_time = 456;
 
-    int fileId = repository.saveFileMetadata(metadata);
+    int file_id = repository.saveFileMetadata(metadata);
 
-    ASSERT_GT(fileId, 0);
+    ASSERT_GT(file_id, 0);
 
     std::optional<FileMetadata> found = repository.findByPath("/tmp/example.txt");
 
@@ -31,7 +33,7 @@ TEST(RepositoryTest, SavesAndFindsFileByPath) {
     EXPECT_EQ(found->name, "example.txt");
     EXPECT_EQ(found->extension, ".txt");
     EXPECT_EQ(found->size, 123);
-    EXPECT_EQ(found->modifiedTime, 456);
+    EXPECT_EQ(found->modified_time, 456);
 }
 
 TEST(RepositoryTest, SearchesByFileName) {
@@ -46,7 +48,7 @@ TEST(RepositoryTest, SearchesByFileName) {
     metadata.name = "report.txt";
     metadata.extension = ".txt";
     metadata.size = 10;
-    metadata.modifiedTime = 100;
+    metadata.modified_time = 100;
 
     ASSERT_GT(repository.saveFileMetadata(metadata), 0);
 
@@ -68,7 +70,7 @@ TEST(RepositoryTest, DeletesFileByPath) {
     metadata.name = "delete_me.txt";
     metadata.extension = ".txt";
     metadata.size = 10;
-    metadata.modifiedTime = 100;
+    metadata.modified_time = 100;
 
     ASSERT_GT(repository.saveFileMetadata(metadata), 0);
 
@@ -91,12 +93,12 @@ TEST(RepositoryTest, FindsTextByPath) {
     metadata.name = "content.txt";
     metadata.extension = ".txt";
     metadata.size = 25;
-    metadata.modifiedTime = 100;
+    metadata.modified_time = 100;
 
-    int fileId = repository.saveFileMetadata(metadata);
-    ASSERT_GT(fileId, 0);
+    int file_id = repository.saveFileMetadata(metadata);
+    ASSERT_GT(file_id, 0);
 
-    ASSERT_TRUE(repository.saveFileText(fileId, "hello world from database"));
+    ASSERT_TRUE(repository.saveFileText(file_id, "hello world from database"));
 
     std::optional<std::string> text = repository.findTextByPath("/tmp/content.txt");
 

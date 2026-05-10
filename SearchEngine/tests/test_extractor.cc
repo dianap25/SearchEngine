@@ -1,6 +1,12 @@
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Unit tests for Extractor. Verify that an existing text
+// file is read into ExtractResult successfully and that a missing
+// file produces a failure result.
+
 #include <gtest/gtest.h>
-#include "Extractor.h"
+
 #include "ExtractResult.h"
+#include "Extractor.h"
 
 #include <string>
 

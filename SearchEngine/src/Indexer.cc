@@ -1,5 +1,7 @@
-//Alesia Filinkova
-//Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of Indexer. Splits text on whitespace,
+// normalizes each token (lowercase ASCII alphanumerics only) and
+// asks the Repository to persist the resulting postings.
 
 #include "Indexer.h"
 
@@ -11,15 +13,15 @@ Indexer::Indexer(Repository& repository)
     : repository_(repository) {
 }
 
-bool Indexer::indexFile(int fileId, const std::string& content) {
+bool Indexer::indexFile(int file_id, const std::string& content) {
     std::vector<std::pair<std::string, int>> tokens = tokenize(content);
 
-    if (!repository_.deleteIndexForFile(fileId)) {
+    if (!repository_.deleteIndexForFile(file_id)) {
         return false;
     }
 
     for (const auto& [term, position] : tokens) {
-        if (!repository_.saveTermPosition(fileId, term, position)) {
+        if (!repository_.saveTermPosition(file_id, term, position)) {
             std::cerr << "Failed to save token: " << term << "\n";
             return false;
         }
@@ -32,15 +34,15 @@ std::vector<std::pair<std::string, int>> Indexer::tokenize(const std::string& co
     std::vector<std::pair<std::string, int>> tokens;
 
     std::stringstream stream(content);
-    std::string rawToken;
+    std::string raw_token;
     int position = 0;
 
-    while (stream >> rawToken) {
-        std::string normalized = normalizeToken(rawToken);
+    while (stream >> raw_token) {
+        std::string normalized = normalizeToken(raw_token);
 
         if (!normalized.empty()) {
             tokens.emplace_back(normalized, position);
-            position++;
+            ++position;
         }
     }
 

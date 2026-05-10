@@ -1,5 +1,7 @@
-//Alesia Filinkova
-//Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Unit tests for Scanner. Cover positive scans against
+// the sample_data fixture, metadata population, supported-extension
+// filtering, and graceful handling of missing directories.
 
 #include <gtest/gtest.h>
 
@@ -33,7 +35,7 @@ TEST(ScannerTest, ReturnsFileMetadata) {
     EXPECT_FALSE(file.path.empty());
     EXPECT_FALSE(file.name.empty());
     EXPECT_GE(file.size, 0);
-    EXPECT_GT(file.modifiedTime, 0);
+    EXPECT_GT(file.modified_time, 0);
 }
 
 TEST(ScannerTest, SupportsTxtAndTexFiles) {
@@ -41,16 +43,16 @@ TEST(ScannerTest, SupportsTxtAndTexFiles) {
 
     std::vector<FileMetadata> files = scanner.scan(TEST_SAMPLE_DATA_DIR);
 
-    const bool hasTxt = std::any_of(files.begin(), files.end(), [](const FileMetadata& file) {
+    const bool has_txt = std::any_of(files.begin(), files.end(), [](const FileMetadata& file) {
         return file.extension == ".txt";
     });
 
-    const bool hasTex = std::any_of(files.begin(), files.end(), [](const FileMetadata& file) {
+    const bool has_tex = std::any_of(files.begin(), files.end(), [](const FileMetadata& file) {
         return file.extension == ".tex";
     });
 
-    EXPECT_TRUE(hasTxt);
-    EXPECT_TRUE(hasTex);
+    EXPECT_TRUE(has_txt);
+    EXPECT_TRUE(has_tex);
 }
 
 TEST(ScannerTest, ReturnsEmptyVectorForMissingDirectory) {

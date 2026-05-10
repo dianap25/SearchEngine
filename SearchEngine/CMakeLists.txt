@@ -11,18 +11,18 @@ find_package(SQLite3 REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 add_executable(searchengine
-    src/main.cpp
-    src/Application.cpp
-    src/Database.cpp
-    src/Scanner.cpp
-    src/Extractor.cpp
-    src/Repository.cpp
-    src/Indexer.cpp
-    src/IndexService.cpp
-    src/SearchEngine.cpp
-    src/RefreshEngine.cpp
-    src/Hasher.cpp
-    src/ContextBuilder.cpp
+    src/main.cc
+    src/Application.cc
+    src/Database.cc
+    src/Scanner.cc
+    src/Extractor.cc
+    src/Repository.cc
+    src/Indexer.cc
+    src/IndexService.cc
+    src/SearchEngine.cc
+    src/RefreshEngine.cc
+    src/Hasher.cc
+    src/ContextBuilder.cc
 )
 
 target_include_directories(searchengine PRIVATE include)

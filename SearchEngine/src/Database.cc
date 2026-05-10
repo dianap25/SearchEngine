@@ -1,5 +1,8 @@
-//Alesia Filinkova
-//Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of the Database wrapper around SQLite.
+// Responsible for connecting, creating tables and indexes used by the
+// index/refresh pipeline, and migrating older databases that predate
+// the content_hash column.
 
 #include "Database.h"
 
@@ -95,9 +98,10 @@ bool Database::initializeSchema() {
         return false;
     }
 
-    // Light migration for older databases that predate the content_hash column.
-    // sqlite3_exec returns SQLITE_ERROR with the message "duplicate column name"
-    // when the column already exists; that case is intentionally ignored.
+    // Lightweight migration for older databases predating the
+    // content_hash column. SQLite returns SQLITE_ERROR with the
+    // message "duplicate column name" when the column already exists;
+    // that case is intentionally ignored.
     char* alter_error = nullptr;
     int alter_rc = sqlite3_exec(
         db_,
@@ -121,22 +125,22 @@ bool Database::initializeSchema() {
 }
 
 bool Database::executeSql(const std::string& sql) {
-    char* errorMessage = nullptr;
+    char* error_message = nullptr;
 
     int rc = sqlite3_exec(
         db_,
         sql.c_str(),
         nullptr,
         nullptr,
-        &errorMessage
+        &error_message
     );
 
     if (rc != SQLITE_OK) {
         std::cerr << "SQL error: "
-                  << (errorMessage != nullptr ? errorMessage : "unknown error")
+                  << (error_message != nullptr ? error_message : "unknown error")
                   << "\n";
 
-        sqlite3_free(errorMessage);
+        sqlite3_free(error_message);
         return false;
     }
 

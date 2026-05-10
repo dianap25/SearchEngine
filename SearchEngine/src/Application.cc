@@ -1,5 +1,8 @@
-//Alesia Filinkova
-//Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of the CLI dispatcher. Parses the
+// command name from argv, validates argument counts and dispatches to
+// the relevant handler. Also owns the help screen shown when the user
+// runs the binary with no arguments.
 
 #include "Application.h"
 
@@ -10,10 +13,10 @@
 #include "RefreshEngine.h"
 #include "Repository.h"
 
+#include <cctype>
 #include <iostream>
 #include <optional>
 #include <string>
-#include <cctype>
 
 int Application::run(int argc, char** argv) {
     if (argc < 2) {
@@ -88,7 +91,7 @@ int Application::run(int argc, char** argv) {
     return 1;
 }
 
-int Application::runIndexCommand(const char* directoryPath) {
+int Application::runIndexCommand(const char* directory_path) {
     Database database;
 
     if (!database.open("index.db")) {
@@ -101,16 +104,16 @@ int Application::runIndexCommand(const char* directoryPath) {
         return 1;
     }
 
-    IndexService indexService(database);
-    IndexSummary summary = indexService.indexDirectory(directoryPath);
+    IndexService index_service(database);
+    IndexSummary summary = index_service.indexDirectory(directory_path);
 
     std::cout << "Indexing finished\n";
-    std::cout << "Scanned files: " << summary.scannedFiles << "\n";
-    std::cout << "Indexed files: " << summary.indexedFiles << "\n";
-    std::cout << "Skipped files: " << summary.skippedFiles << "\n";
-    std::cout << "Failed files: " << summary.failedFiles << "\n";
+    std::cout << "Scanned files: " << summary.scanned_files << "\n";
+    std::cout << "Indexed files: " << summary.indexed_files << "\n";
+    std::cout << "Skipped files: " << summary.skipped_files << "\n";
+    std::cout << "Failed files:  " << summary.failed_files << "\n";
 
-    return summary.failedFiles == 0 ? 0 : 2;
+    return summary.failed_files == 0 ? 0 : 2;
 }
 
 int Application::handleRefresh(const std::string& path) {
@@ -172,7 +175,7 @@ int Application::handleSearchContent(const std::string& word) {
         return 0;
     }
 
-    ContextBuilder contextBuilder(40);
+    ContextBuilder context_builder(40);
 
     for (const auto& r : results) {
         std::cout << r.path
@@ -182,7 +185,7 @@ int Application::handleSearchContent(const std::string& word) {
         std::optional<std::string> text = repo.findTextByPath(r.path);
 
         if (text.has_value()) {
-            std::string context = contextBuilder.build(text.value(), word);
+            std::string context = context_builder.build(text.value(), word);
 
             if (!context.empty()) {
                 std::cout << "  Context: " << context << "\n";
@@ -207,29 +210,28 @@ std::string Application::normalize(const std::string& input) {
 
 void Application::printUsage() const {
     std::cout << "==============================================\n";
-    std::cout << "  SearchEngine - lokalna wyszukiwarka plikow\n";
+    std::cout << "  SearchEngine - local file search\n";
     std::cout << "==============================================\n\n";
 
-    std::cout << "Co teraz zrobic? Wykonaj kroki w tej kolejnosci:\n\n";
+    std::cout << "What now? Run the steps below in order:\n\n";
 
-    std::cout << "  1) Zindeksuj katalog z plikami (jednorazowo lub po nowych plikach):\n";
+    std::cout << "  1) Build the index for a directory (once, or after new files):\n";
     std::cout << "       ./searchengine index ../examples\n\n";
 
-    std::cout << "  2) Szukaj plikow po fragmencie nazwy:\n";
+    std::cout << "  2) Search files by a fragment of their name:\n";
     std::cout << "       ./searchengine search-name kawa\n\n";
 
-    std::cout << "  3) Szukaj plikow po slowie z ich tresci (z fragmentem kontekstu):\n";
+    std::cout << "  3) Search by a word inside file contents (with a context snippet):\n";
     std::cout << "       ./searchengine search-content tatry\n\n";
 
-    std::cout << "  4) Po zmianach na dysku odswiez indeks:\n";
+    std::cout << "  4) After files change on disk, refresh the index:\n";
     std::cout << "       ./searchengine refresh ../examples\n\n";
 
-    std::cout << "Pelna lista polecen:\n";
-    std::cout << "  ./searchengine index <katalog>          - buduje indeks\n";
-    std::cout << "  ./searchengine refresh <katalog>        - aktualizuje indeks\n";
-    std::cout << "  ./searchengine search-name <fraza>      - szuka po nazwie pliku\n";
-    std::cout << "  ./searchengine search-content <slowo>   - szuka po tresci pliku\n\n";
+    std::cout << "Full command reference:\n";
+    std::cout << "  ./searchengine index <dir>             - build the index\n";
+    std::cout << "  ./searchengine refresh <dir>           - update the index\n";
+    std::cout << "  ./searchengine search-name <phrase>    - search by file name\n";
+    std::cout << "  ./searchengine search-content <word>   - search inside file contents\n\n";
 
-    std::cout << "Wskazowka: katalog 'examples/' zawiera gotowe pliki testowe,\n";
-    std::cout << "na ktorych mozesz przecwiczyc dzialanie programu.\n";
+    std::cout << "Tip: the 'examples/' folder ships with ready-to-index sample files.\n";
 }

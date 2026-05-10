@@ -1,5 +1,7 @@
-//Alesia Filinkova
-//Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Unit tests for ContextBuilder. Cover margin clamping
+// at start and end of text, missing phrase, case-insensitive
+// matching, empty inputs, and the default 40-character margin.
 
 #include <gtest/gtest.h>
 
