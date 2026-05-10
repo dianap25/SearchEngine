@@ -1,8 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Testy jednostkowe klasy Repository. Sterują bazą SQLite
-// w pamięci przez publiczne API i sprawdzają, czy metadane plików,
-// wydobyty tekst oraz wyszukiwanie po nazwie zachowują się zgodnie
-// z dokumentacją.
+
 
 #include <gtest/gtest.h>
 

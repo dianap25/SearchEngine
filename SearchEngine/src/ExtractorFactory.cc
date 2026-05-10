@@ -1,7 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Implementacja klasy ExtractorFactory. Sprawdza rozszerzenie
-// pliku i zwraca pasujący konkretny ekstraktor; dla nieznanych
-// rozszerzeń domyślnie zwraca TextExtractor.
+
 
 #include "ExtractorFactory.h"
 

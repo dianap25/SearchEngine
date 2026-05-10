@@ -1,9 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Implementacja klasy IndexService. Dla każdego obsługiwanego
-// pliku pod katalogiem głównym uruchamia pełny pipeline
-// ekstrakcja -> zapis metadanych -> zapis tekstu -> indeksacja w
-// ramach własnej transakcji, dzięki czemu pojedyncze niepowodzenie
-// nie psuje całego indeksu.
+
 
 #include "IndexService.h"
 

@@ -1,9 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Implementacja opakowania klasy Database wokół SQLite.
-// Trzyma połączenie w std::unique_ptr z własnym deleterem, dzięki
-// czemu sqlite3_close wykonuje się automatycznie przy destrukcji;
-// odpowiada również za utworzenie schematu i migrację kolumny
-// content_hash.
+
 
 #include "Database.h"
 

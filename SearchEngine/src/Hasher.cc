@@ -1,8 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Implementacja Hasher::sha256 oparta na jednorazowej funkcji
-// SHA256() z OpenSSL. Wynik to kanoniczny szesnastkowy skrót w
-// małych literach, używany przez RefreshEngine do porównywania
-// fingerprintów plików.
+
 
 #include "Hasher.h"
 

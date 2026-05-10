@@ -1,8 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Testy jednostkowe klasy ContextBuilder. Pokrywają obcięcie
-// marginesu na początku i końcu tekstu, brak frazy, dopasowanie
-// niewrażliwe na wielkość liter, puste argumenty oraz domyślny
-// margines 40 znaków.
+
 
 #include <gtest/gtest.h>
 

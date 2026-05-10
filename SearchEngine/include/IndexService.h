@@ -1,6 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Wysokopoziomowa orkiestracja jednego przebiegu indeksacji.
-// Spina ze sobą Scanner, Extractor, Repository i Indexer pod jednym
+// Opis: Spina ze sobą Scanner, Extractor, Repository i Indexer pod jednym
 // punktem wejścia indexDirectory(), używanym przez polecenie CLI
 // "index".
 

@@ -1,8 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Wynik próby ekstrakcji tekstu. Niesie zarówno wydobytą treść,
-// jak i komunikat diagnostyczny, dzięki czemu wywołujący mogą dalej
-// korzystać z obsługi błędów opartej na kodach powrotu zamiast
-// wyjątków.
+// Opis: Wynik próby ekstrakcji tekstu (treść i komunikat diagnostyczny)
 
 #pragma once
 

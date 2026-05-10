@@ -1,8 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Testy jednostkowe klasy Scanner. Pokrywają poprawne skany
-// fixtury sample_data, wypełnianie metadanych, filtrowanie po
-// obsługiwanych rozszerzeniach oraz spokojne radzenie sobie z
-// nieistniejącymi katalogami.
+
 
 #include <gtest/gtest.h>
 

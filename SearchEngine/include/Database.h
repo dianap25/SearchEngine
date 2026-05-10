@@ -1,9 +1,8 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Cienkie opakowanie RAII na połączenie z bazą SQLite.
+// Opis: Opakowanie RAII na połączenie z bazą SQLite.
 // Posiada uchwyt sqlite3 trzymany w std::unique_ptr z własnym
 // deleterem, udostępnia metodę connection() dla klasy Repository
-// oraz odpowiada za inicjalizację schematu (wraz z migracją kolumny
-// content_hash) używanego przez polecenia index/refresh.
+// oraz odpowiada za inicjalizację schematu używanego przez polecenia index/refresh.
 
 #pragma once
 

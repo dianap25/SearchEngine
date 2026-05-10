@@ -1,8 +1,7 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
 // Opis: Struktura danych opisująca pojedynczy plik na dysku oraz
 // stan, jaki o tym pliku przechowuje indeks (id w bazie, hash
-// zawartości). Używana jako wspólny typ wymiany między klasami
-// Scanner, Repository, Indexer i RefreshEngine.
+// zawartości).
 
 #pragma once
 

@@ -1,10 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Implementacja klasy PdfExtractor. Uruchamia pdftotext jako
-// proces potomny przez fork + execvp; ścieżka pliku trafia
-// bezpośrednio do argv, więc nigdy nie przechodzi przez powłokę.
-//
-// Bez powłoki -- argv przekazywane bezpośrednio do pdftotext, aby
-// uniknąć command injection.
+
 
 #include "PdfExtractor.h"
 

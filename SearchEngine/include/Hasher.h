@@ -1,5 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Drobny pomocnik liczący SHA-256 oparty na bibliotece OpenSSL.
+// Opis: Liczy SHA-256 oparty na bibliotece OpenSSL.
 // Używany przez IndexService oraz RefreshEngine do wyliczenia
 // fingerprintu treści, dzięki czemu refresh może pominąć
 // niezmienione pliki.

@@ -1,9 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Testy jednostkowe hierarchii ekstraktorów. Pokrywają
-// TextExtractor end-to-end na fixturze sample_data oraz
-// PdfExtractor na tej samej ścieżce; przypadek PDF jest pomijany,
-// gdy pdftotext nie jest dostępny w PATH, żeby zestaw testów
-// pozostał przenośny.
+
 
 #include <gtest/gtest.h>
 

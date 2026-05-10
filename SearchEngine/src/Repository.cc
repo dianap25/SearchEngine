@@ -1,8 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Implementacja klasy Repository. Hermetyzuje każde zapytanie
-// SQL używane przez silnik: UPSERT metadanych pliku, cache wydobytego
-// tekstu, zapis termów i postingów oraz zapytania wyszukujące,
-// które obsługują polecenia search-name i search-content.
+
 
 #include "Repository.h"
 

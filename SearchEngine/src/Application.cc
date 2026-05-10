@@ -1,8 +1,4 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Implementacja dyspozytora CLI. Parsuje nazwę polecenia z
-// argv, weryfikuje liczbę argumentów i kieruje wywołanie do
-// odpowiedniego handlera. Posiada również ekran pomocy wyświetlany,
-// gdy program zostanie uruchomiony bez argumentów.
 
 #include "Application.h"
 

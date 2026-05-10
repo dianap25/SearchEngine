@@ -1,8 +1,6 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
 // Opis: Inkrementalny aktualizator. Przechodzi system plików, liczy
-// hash każdego pliku i synchronizuje indeks: nowe pliki są
-// indeksowane, zmienione re-indeksowane, a pliki, które zniknęły z
-// dysku, są usuwane z bazy.
+// hash każdego pliku i synchronizuje indeks
 
 #pragma once
 

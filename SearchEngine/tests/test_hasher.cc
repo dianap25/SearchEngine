@@ -1,7 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Testy jednostkowe metody Hasher::sha256. Pokrywają znany
-// skrót pustego stringa, determinizm dla powtórzonego wejścia oraz
-// oczekiwanie, że różne wejścia produkują różne skróty.
+
 
 #include <gtest/gtest.h>
 

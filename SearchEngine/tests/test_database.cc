@@ -1,7 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Testy jednostkowe klasy Database. Pokrywają open(),
-// inicjalizację schematu i weryfikują, że wszystkie wymagane tabele
-// oraz indeksy zostały utworzone przez initializeSchema().
+
 
 #include <gtest/gtest.h>
 

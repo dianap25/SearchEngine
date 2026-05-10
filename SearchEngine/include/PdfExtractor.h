@@ -1,6 +1,6 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
 // Opis: Ekstraktor PDF. Uruchamia pdftotext jako proces potomny
-// (bez powłoki) i odczytuje jego stdout do bufora typu string.
+//i odczytuje jego stdout do bufora typu string.
 
 #pragma once
 

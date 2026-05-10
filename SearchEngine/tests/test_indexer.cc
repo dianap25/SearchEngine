@@ -1,7 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Testy jednostkowe klasy Indexer. Pokrywają normalizację
-// tokenów oraz pełny przepływ "zapis tekstu + indeksacja pliku" na
-// bazie SQLite w pamięci.
+
 
 #include <gtest/gtest.h>
 

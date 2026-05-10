@@ -1,7 +1,6 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
 // Opis: Pomocnik wycinający krótki fragment tekstu wokół pierwszego
-// wystąpienia szukanej frazy (porównywanie niezależne od wielkości
-// liter). Używany przez CLI do wyświetlenia kontekstu obok każdego
+// wystąpienia szukanej frazy. Używany przez CLI do wyświetlenia kontekstu obok każdego
 // trafienia search-content.
 
 #pragma once

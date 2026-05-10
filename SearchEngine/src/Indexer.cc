@@ -1,7 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Implementacja klasy Indexer. Dzieli tekst na białych
-// znakach, normalizuje każdy token (zostawia tylko małe litery i
-// cyfry ASCII) i prosi Repository o utrwalenie powstałych postingów.
+
 
 #include "Indexer.h"
 

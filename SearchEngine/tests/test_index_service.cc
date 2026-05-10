@@ -1,7 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Test jednostkowy klasy IndexService. Tworzy mały katalog na
-// dysku, uruchamia na nim pełny pipeline indeksacji i sprawdza
-// zarówno liczniki IndexSummary, jak i wynik wyszukiwania.
+
 
 #include <gtest/gtest.h>
 

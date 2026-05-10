@@ -1,7 +1,7 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Główny dyspozytor CLI. Parsuje argv, mapuje polecenia
+// Opis: Parsuje argv, mapuje polecenia
 // (index/refresh/search-name/search-content) na odpowiednie usługi i
-// wyświetla przyjazny ekran pomocy, gdy nie podano żadnego
+// wyświetla informacje, gdy nie podano żadnego
 // polecenia.
 
 #pragma once

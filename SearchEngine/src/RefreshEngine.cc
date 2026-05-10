@@ -1,8 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Implementacja klasy RefreshEngine. Porównuje stan dysku ze
-// stanem bazy: skanuje katalog, wczytuje istniejące metadane, liczy
-// hash treści każdego pliku, a następnie wykonuje minimalny zbiór
-// zmian potrzebnych, aby przywrócić zgodność indeksu z dyskiem.
+
 
 #include "RefreshEngine.h"
 

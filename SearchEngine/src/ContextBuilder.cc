@@ -1,8 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Implementacja klasy ContextBuilder. Wyszukiwanie niewrażliwe
-// na wielkość liter realizuje poprzez zlowercase'owanie obu buforów,
-// a następnie zwraca podciąg z oryginalnego tekstu obcięty do granic
-// pliku, dzięki czemu wynik zachowuje oryginalną wielkość liter.
+
 
 #include "ContextBuilder.h"
 

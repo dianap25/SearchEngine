@@ -1,8 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Implementacja klasy Scanner. Przechodzi drzewo katalogów
-// przez std::filesystem, filtruje pliki po obsługiwanych
-// rozszerzeniach i konwertuje zależny od platformy file_time_type na
-// uniksowy timestamp, który reszta silnika może zapisać i porównywać.
+
 
 #include "Scanner.h"
 

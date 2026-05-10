@@ -1,8 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Testy jednostkowe klasy RefreshEngine. Wszystkie scenariusze
-// uruchamiają się na bazie SQLite w pamięci oraz tymczasowym
-// katalogu na dysku, dzięki czemu logika refreshu jest sprawdzana
-// end-to-end bez dotykania danych produkcyjnych.
+
 
 #include <gtest/gtest.h>
 

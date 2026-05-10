@@ -1,7 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Warstwa dostępu do bazy. Wszystkie odczyty i zapisy do tabel
-// files, file_texts, terms i postings są wykonywane tutaj, aby
-// pozostała część silnika nie musiała znać surowego SQL.
+// Opis: Warstwa dostępu do bazy. 
 
 #pragma once
 

@@ -1,5 +1,5 @@
 // Autorzy: Alesia Filinkova, Diana Pelin
-// Opis: Tokenizer oraz writer postingów. Dzieli wydobyty tekst na
+// Opis: Dzieli wydobyty tekst na
 // znormalizowane termy wraz z ich pozycjami i zapisuje je przez
 // Repository, tak aby search-content mogło je później odnaleźć.
 
