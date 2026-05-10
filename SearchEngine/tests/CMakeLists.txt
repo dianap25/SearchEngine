@@ -8,6 +8,8 @@ add_executable(unit_tests
     test_indexer.cc
     test_index_service.cc
     test_context_builder.cc
+    test_hasher.cc
+    test_refresh_engine.cc
 
     ../src/IndexService.cc
     ../src/Database.cc
@@ -19,6 +21,7 @@ add_executable(unit_tests
     ../src/Indexer.cc
     ../src/ContextBuilder.cc
     ../src/Hasher.cc
+    ../src/RefreshEngine.cc
 )
 
 target_include_directories(unit_tests PRIVATE ../include)
