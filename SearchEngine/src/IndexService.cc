@@ -8,12 +8,14 @@
 
 #include "ExtractResult.h"
 #include "Extractor.h"
+#include "ExtractorFactory.h"
 #include "Hasher.h"
 #include "Indexer.h"
 #include "Repository.h"
 #include "Scanner.h"
 
 #include <iostream>
+#include <memory>
 #include <vector>
 
 IndexService::IndexService(Database& database)
@@ -24,7 +26,6 @@ IndexSummary IndexService::indexDirectory(const std::string& root_path) {
     IndexSummary summary;
 
     Scanner scanner;
-    Extractor extractor;
     Repository repository(database_.connection());
     Indexer indexer(repository);
 
@@ -32,7 +33,8 @@ IndexSummary IndexService::indexDirectory(const std::string& root_path) {
     summary.scanned_files = static_cast<int>(files.size());
 
     for (const FileMetadata& file : files) {
-        ExtractResult result = extractor.extract(file.path);
+        std::unique_ptr<Extractor> extractor = ExtractorFactory::create(file.path);
+        ExtractResult result = extractor->extract(file.path);
         if (!result.success) continue;
         std::string content = result.content;
 

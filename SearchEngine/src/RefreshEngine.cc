@@ -8,12 +8,14 @@
 
 #include "ExtractResult.h"
 #include "Extractor.h"
+#include "ExtractorFactory.h"
 #include "Hasher.h"
 #include "Indexer.h"
 #include "Repository.h"
 #include "Scanner.h"
 
 #include <iostream>
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -24,7 +26,6 @@ void RefreshEngine::refresh(const std::string& root_path, Database& db) {
     }
 
     Scanner scanner;
-    Extractor extractor;
 
     Repository repo(db.connection());
     Indexer indexer(repo);
@@ -43,7 +44,8 @@ void RefreshEngine::refresh(const std::string& root_path, Database& db) {
 
     for (const auto& fs_file : fs_files) {
         seen.insert(fs_file.path);
-        ExtractResult result = extractor.extract(fs_file.path);
+        std::unique_ptr<Extractor> extractor = ExtractorFactory::create(fs_file.path);
+        ExtractResult result = extractor->extract(fs_file.path);
         if (!result.success) {
             std::cerr << "[SKIP] " << fs_file.path
                       << " -> " << result.error_message << "\n";

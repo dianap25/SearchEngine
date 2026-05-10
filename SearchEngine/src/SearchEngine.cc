@@ -8,21 +8,23 @@
 #include "ContextBuilder.h"
 #include "ExtractResult.h"
 #include "Extractor.h"
+#include "ExtractorFactory.h"
 #include "FileMetadata.h"
 #include "Scanner.h"
 
 #include <iostream>
+#include <memory>
 #include <vector>
 
 void SearchEngine::search(const std::string& root_path, const std::string& phrase) {
     Scanner scanner;
-    Extractor extractor;
     ContextBuilder context_builder;
 
     std::vector<FileMetadata> files = scanner.scan(root_path);
 
     for (const FileMetadata& file : files) {
-        ExtractResult result = extractor.extract(file.path);
+        std::unique_ptr<Extractor> extractor = ExtractorFactory::create(file.path);
+        ExtractResult result = extractor->extract(file.path);
 
         if (!result.success) {
             std::cerr << "[Extractor ERROR] "

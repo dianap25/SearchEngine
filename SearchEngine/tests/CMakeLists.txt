@@ -11,7 +11,9 @@ add_executable(unit_tests
 
     ../src/IndexService.cc
     ../src/Database.cc
-    ../src/Extractor.cc
+    ../src/TextExtractor.cc
+    ../src/PdfExtractor.cc
+    ../src/ExtractorFactory.cc
     ../src/Scanner.cc
     ../src/Repository.cc
     ../src/Indexer.cc

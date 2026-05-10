@@ -15,7 +15,9 @@ add_executable(searchengine
     src/Application.cc
     src/Database.cc
     src/Scanner.cc
-    src/Extractor.cc
+    src/TextExtractor.cc
+    src/PdfExtractor.cc
+    src/ExtractorFactory.cc
     src/Repository.cc
     src/Indexer.cc
     src/IndexService.cc

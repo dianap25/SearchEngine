@@ -1,8 +1,8 @@
 // Authors: Alesia Filinkova, Diana Pelin
-// Description: Text extractor that picks an extraction strategy based
-// on file extension (.txt/.tex/no-ext = direct read, .pdf = pdftotext).
-// Returns an ExtractResult so callers can keep return-code-style
-// error handling.
+// Description: Abstract base of the text-extractor strategy
+// hierarchy. Concrete subclasses (TextExtractor, PdfExtractor) plug
+// into a single dispatcher (ExtractorFactory) which picks the right
+// strategy based on the file's extension.
 
 #pragma once
 
@@ -11,19 +11,16 @@
 #include <string>
 
 /**
- * @brief Reads textual content from a file on disk.
+ * @brief Strategy interface for reading textual content from a file.
  */
 class Extractor {
 public:
+    virtual ~Extractor() = default;
+
     /**
-     * @brief Extract text from the given path.
+     * @brief Extract textual content from @p file_path.
      * @param file_path Path to the file on disk.
      * @return Extracted content or a failure result.
      */
-    ExtractResult extract(const std::string& file_path);
-
-private:
-    ExtractResult extractText(const std::string& file_path);
-    ExtractResult extractPdf(const std::string& file_path);
-    std::string extractPdfInternal(const std::string& file_path);
+    virtual ExtractResult extract(const std::string& file_path) const = 0;
 };
