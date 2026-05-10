@@ -35,8 +35,8 @@ bool Repository::executeSql(const std::string& sql) {
     int rc = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &error_message);
 
     if (rc != SQLITE_OK) {
-        std::cerr << "SQL error: "
-                  << (error_message != nullptr ? error_message : "unknown error")
+        std::cerr << "Blad SQL: "
+                  << (error_message != nullptr ? error_message : "nieznany blad")
                   << "\n";
 
         sqlite3_free(error_message);
@@ -63,7 +63,7 @@ int Repository::saveFileMetadata(const FileMetadata& metadata) {
     sqlite3_stmt* statement = nullptr;
 
     if (sqlite3_prepare_v2(db_, sql, -1, &statement, nullptr) != SQLITE_OK) {
-        std::cerr << "Failed to prepare saveFileMetadata statement\n";
+        std::cerr << "Nie udalo sie przygotowac zapytania saveFileMetadata\n";
         return -1;
     }
 
@@ -82,7 +82,7 @@ int Repository::saveFileMetadata(const FileMetadata& metadata) {
     if (sqlite3_step(statement) == SQLITE_ROW) {
         file_id = sqlite3_column_int(statement, 0);
     } else {
-        std::cerr << "Failed to save file metadata: "
+        std::cerr << "Nie udalo sie zapisac metadanych pliku: "
                   << sqlite3_errmsg(db_)
                   << "\n";
     }
@@ -102,7 +102,7 @@ bool Repository::saveFileText(int file_id, const std::string& content) {
     sqlite3_stmt* statement = nullptr;
 
     if (sqlite3_prepare_v2(db_, sql, -1, &statement, nullptr) != SQLITE_OK) {
-        std::cerr << "Failed to prepare saveFileText statement\n";
+        std::cerr << "Nie udalo sie przygotowac zapytania saveFileText\n";
         return false;
     }
 
@@ -112,7 +112,7 @@ bool Repository::saveFileText(int file_id, const std::string& content) {
     bool success = sqlite3_step(statement) == SQLITE_DONE;
 
     if (!success) {
-        std::cerr << "Failed to save file text: "
+        std::cerr << "Nie udalo sie zapisac tresci pliku: "
                   << sqlite3_errmsg(db_)
                   << "\n";
     }
@@ -145,7 +145,7 @@ bool Repository::saveTermPositionsBatch(
             -1,
             &insert_term_stmt,
             nullptr) != SQLITE_OK) {
-        std::cerr << "Failed to prepare insert-term statement: "
+        std::cerr << "Nie udalo sie przygotowac zapytania insert-term: "
                   << sqlite3_errmsg(db_) << "\n";
         cleanup();
         return false;
@@ -157,7 +157,7 @@ bool Repository::saveTermPositionsBatch(
             -1,
             &select_term_stmt,
             nullptr) != SQLITE_OK) {
-        std::cerr << "Failed to prepare select-term statement: "
+        std::cerr << "Nie udalo sie przygotowac zapytania select-term: "
                   << sqlite3_errmsg(db_) << "\n";
         cleanup();
         return false;
@@ -169,7 +169,7 @@ bool Repository::saveTermPositionsBatch(
             -1,
             &insert_posting_stmt,
             nullptr) != SQLITE_OK) {
-        std::cerr << "Failed to prepare insert-posting statement: "
+        std::cerr << "Nie udalo sie przygotowac zapytania insert-posting: "
                   << sqlite3_errmsg(db_) << "\n";
         cleanup();
         return false;
@@ -189,7 +189,7 @@ bool Repository::saveTermPositionsBatch(
             sqlite3_bind_text(insert_term_stmt, 1, term.c_str(), -1, SQLITE_TRANSIENT);
             int rc = sqlite3_step(insert_term_stmt);
             if (rc != SQLITE_DONE) {
-                std::cerr << "Failed to insert term '" << term << "': "
+                std::cerr << "Nie udalo sie wstawic termu '" << term << "': "
                           << sqlite3_errmsg(db_) << "\n";
                 cleanup();
                 return false;
@@ -199,7 +199,7 @@ bool Repository::saveTermPositionsBatch(
             sqlite3_clear_bindings(select_term_stmt);
             sqlite3_bind_text(select_term_stmt, 1, term.c_str(), -1, SQLITE_TRANSIENT);
             if (sqlite3_step(select_term_stmt) != SQLITE_ROW) {
-                std::cerr << "Failed to look up id of term '" << term << "': "
+                std::cerr << "Nie udalo sie odnalezc id termu '" << term << "': "
                           << sqlite3_errmsg(db_) << "\n";
                 cleanup();
                 return false;
@@ -215,7 +215,7 @@ bool Repository::saveTermPositionsBatch(
         sqlite3_bind_int(insert_posting_stmt, 3, position);
 
         if (sqlite3_step(insert_posting_stmt) != SQLITE_DONE) {
-            std::cerr << "Failed to insert posting (term='" << term
+            std::cerr << "Nie udalo sie wstawic postingu (term='" << term
                       << "', pos=" << position << "): "
                       << sqlite3_errmsg(db_) << "\n";
             cleanup();
@@ -275,7 +275,7 @@ std::optional<std::string> Repository::findTextByPath(const std::string& path) {
     sqlite3_stmt* statement = nullptr;
 
     if (sqlite3_prepare_v2(db_, sql, -1, &statement, nullptr) != SQLITE_OK) {
-        std::cerr << "Failed to prepare findTextByPath statement: "
+        std::cerr << "Nie udalo sie przygotowac zapytania findTextByPath: "
                   << sqlite3_errmsg(db_)
                   << "\n";
         return std::nullopt;

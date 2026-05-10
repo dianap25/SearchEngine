@@ -21,7 +21,7 @@
 
 void RefreshEngine::refresh(const std::string& root_path, Database& db) {
     if (!db.initializeSchema()) {
-        std::cerr << "Failed to initialize schema before refresh\n";
+        std::cerr << "Nie udalo sie zainicjalizowac schematu przed odswiezeniem\n";
         return;
     }
 
@@ -47,7 +47,7 @@ void RefreshEngine::refresh(const std::string& root_path, Database& db) {
         std::unique_ptr<Extractor> extractor = ExtractorFactory::create(fs_file.path);
         ExtractResult result = extractor->extract(fs_file.path);
         if (!result.success) {
-            std::cerr << "[SKIP] " << fs_file.path
+            std::cerr << "[POMINIETO] " << fs_file.path
                       << " -> " << result.error_message << "\n";
             continue;
         }
