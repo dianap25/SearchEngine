@@ -96,7 +96,7 @@ Indeks zostanie zaktualizowany inkrementalnie – pliki niezmienione (rozpoznawa
 cd build
 ./searchengine index ../examples            # 1. zbuduj indeks
 ./searchengine search-name nalesniki        # 2. szukaj po nazwie
-./searchengine search-content programowanie # 3. szukaj po tresci
+./searchengine search-content programowania # 3. szukaj po tresci
 ./searchengine refresh ../examples          # 4. odswiez po zmianach
 ```
 
