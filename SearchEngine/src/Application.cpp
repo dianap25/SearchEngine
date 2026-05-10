@@ -3,6 +3,7 @@
 
 #include "Application.h"
 
+#include "ContextBuilder.h"
 #include "Database.h"
 #include "IndexService.h"
 #include "IndexSummary.h"
@@ -10,12 +11,12 @@
 #include "Repository.h"
 
 #include <iostream>
+#include <optional>
 #include <string>
 #include <cctype>
 
 int Application::run(int argc, char** argv) {
     if (argc < 2) {
-        std::cerr << "No command provided\n";
         printUsage();
         return 1;
     }
@@ -166,10 +167,22 @@ int Application::handleSearchContent(const std::string& word) {
         return 0;
     }
 
+    ContextBuilder contextBuilder(40);
+
     for (const auto& r : results) {
-        std::cout << r.path 
-                  << " -> occurrences: " << r.occurrences 
+        std::cout << r.path
+                  << " -> occurrences: " << r.occurrences
                   << std::endl;
+
+        std::optional<std::string> text = repo.findTextByPath(r.path);
+
+        if (text.has_value()) {
+            std::string context = contextBuilder.build(text.value(), word);
+
+            if (!context.empty()) {
+                std::cout << "  Context: " << context << "\n";
+            }
+        }
     }
 
     return 0;
@@ -188,9 +201,30 @@ std::string Application::normalize(const std::string& input) {
 }
 
 void Application::printUsage() const {
-    std::cout << "Usage:\n";
-    std::cout << "  ./searchengine index <directory>\n";
-    std::cout << "  ./searchengine refresh <directory>\n";
-    std::cout << "  ./searchengine search-name <phrase>\n";
-    std::cout << "  ./searchengine search-content <word>\n";
+    std::cout << "==============================================\n";
+    std::cout << "  SearchEngine - lokalna wyszukiwarka plikow\n";
+    std::cout << "==============================================\n\n";
+
+    std::cout << "Co teraz zrobic? Wykonaj kroki w tej kolejnosci:\n\n";
+
+    std::cout << "  1) Zindeksuj katalog z plikami (jednorazowo lub po nowych plikach):\n";
+    std::cout << "       ./searchengine index ../examples\n\n";
+
+    std::cout << "  2) Szukaj plikow po fragmencie nazwy:\n";
+    std::cout << "       ./searchengine search-name kawa\n\n";
+
+    std::cout << "  3) Szukaj plikow po slowie z ich tresci (z fragmentem kontekstu):\n";
+    std::cout << "       ./searchengine search-content tatry\n\n";
+
+    std::cout << "  4) Po zmianach na dysku odswiez indeks:\n";
+    std::cout << "       ./searchengine refresh ../examples\n\n";
+
+    std::cout << "Pelna lista polecen:\n";
+    std::cout << "  ./searchengine index <katalog>          - buduje indeks\n";
+    std::cout << "  ./searchengine refresh <katalog>        - aktualizuje indeks\n";
+    std::cout << "  ./searchengine search-name <fraza>      - szuka po nazwie pliku\n";
+    std::cout << "  ./searchengine search-content <slowo>   - szuka po tresci pliku\n\n";
+
+    std::cout << "Wskazowka: katalog 'examples/' zawiera gotowe pliki testowe,\n";
+    std::cout << "na ktorych mozesz przecwiczyc dzialanie programu.\n";
 }

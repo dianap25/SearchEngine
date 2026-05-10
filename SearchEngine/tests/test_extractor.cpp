@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "Extractor.h"
+#include "ExtractResult.h"
 
 #include <string>
 
@@ -11,15 +12,17 @@ TEST(ExtractorTest, ExtractsTextFromExistingTxtFile) {
     Extractor extractor;
     std::string path = std::string(TEST_SAMPLE_DATA_DIR) + "/example.txt";
 
-    std::string text = extractor.extract(path);
+    ExtractResult result = extractor.extract(path);
 
-    EXPECT_FALSE(text.empty());
+    EXPECT_TRUE(result.success);
+    EXPECT_FALSE(result.content.empty());
 }
 
-TEST(ExtractorTest, ReturnsEmptyStringForMissingFile) {
+TEST(ExtractorTest, ReturnsFailureForMissingFile) {
     Extractor extractor;
 
-    std::string text = extractor.extract("missing_file.txt");
+    ExtractResult result = extractor.extract("missing_file.txt");
 
-    EXPECT_TRUE(text.empty());
+    EXPECT_FALSE(result.success);
+    EXPECT_TRUE(result.content.empty());
 }

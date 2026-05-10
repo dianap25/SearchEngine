@@ -22,11 +22,12 @@ add_executable(searchengine
     src/SearchEngine.cpp
     src/RefreshEngine.cpp
     src/Hasher.cpp
+    src/ContextBuilder.cpp
 )
 
 target_include_directories(searchengine PRIVATE include)
 target_link_libraries(searchengine PRIVATE SQLite::SQLite3)
-target_link_libraries(searchengine PRIVATE crypto ssl)
+target_link_libraries(searchengine PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
 enable_testing()
 add_subdirectory(tests)

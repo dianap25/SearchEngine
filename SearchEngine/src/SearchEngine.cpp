@@ -2,6 +2,7 @@
 //Diana Pelin
 
 #include "SearchEngine.h"
+#include "ContextBuilder.h"
 #include "Scanner.h"
 #include "Extractor.h"
 #include "FileMetadata.h"
@@ -12,6 +13,7 @@
 void SearchEngine::search(const std::string& rootPath, const std::string& phrase) {
     Scanner scanner;
     Extractor extractor;
+    ContextBuilder contextBuilder;
 
     std::vector<FileMetadata> files = scanner.scan(rootPath);
 
@@ -26,35 +28,19 @@ void SearchEngine::search(const std::string& rootPath, const std::string& phrase
             continue;
         }
 
-    std::string content = result.content;
+        std::string content = result.content;
 
         if (content.empty()) {
             continue;
         }
 
-        if (content.find(phrase) != std::string::npos) {
-            std::string context = buildContext(content, phrase);
+        std::string context = contextBuilder.build(content, phrase);
+
+        if (!context.empty()) {
             std::cout << "Found in file: " << file.path << "\n";
             std::cout << "Size: " << file.size << " bytes\n";
             std::cout << "Modified time: " << file.modifiedTime << "\n";
             std::cout << "Context: " << context << "\n\n";
         }
     }
-}
-
-std::string SearchEngine::buildContext(const std::string& text, const std::string& phrase, std::size_t contextSize) {
-    std::size_t position = text.find(phrase);
-
-    if (position == std::string::npos) {
-        return "";
-    }
-
-    std::size_t start = (position > contextSize) ? position - contextSize : 0;
-    std::size_t end = position + phrase.size() + contextSize;
-
-    if (end > text.size()) {
-        end = text.size();
-    }
-
-    return text.substr(start, end - start);
 }

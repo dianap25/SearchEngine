@@ -7,6 +7,7 @@ add_executable(unit_tests
     test_repository.cpp
     test_indexer.cpp
     test_index_service.cpp
+    test_context_builder.cpp
 
     ../src/IndexService.cpp
     ../src/Database.cpp
@@ -14,6 +15,7 @@ add_executable(unit_tests
     ../src/Scanner.cpp
     ../src/Repository.cpp
     ../src/Indexer.cpp
+    ../src/ContextBuilder.cpp
 )
 
 target_include_directories(unit_tests PRIVATE ../include)
