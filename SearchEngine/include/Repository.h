@@ -11,6 +11,7 @@
 
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 struct sqlite3;
@@ -54,11 +55,35 @@ public:
 
     /**
      * @brief Append a single (term, position) pair to postings.
+     *
+     * Prefer saveTermPositionsBatch when writing more than a handful
+     * of postings -- this method prepares two statements per call.
+     *
      * @param file_id Database id of the file.
      * @param term Normalized term string.
      * @param position Token position within the file.
      */
+    [[deprecated("Use saveTermPositionsBatch for files with more than a few tokens.")]]
     bool saveTermPosition(int file_id, const std::string& term, int position);
+
+    /**
+     * @brief Insert all postings for a single file using prepared
+     *        statements and a per-file term cache.
+     *
+     * Prepares the term-insert, term-select and posting-insert
+     * statements once, then iterates the @p tokens vector binding,
+     * stepping and resetting each one. Repeated terms within a single
+     * file are resolved from an in-memory cache to avoid extra
+     * round-trips to the terms table.
+     *
+     * @param file_id Database id of the file.
+     * @param tokens (normalized term, position) pairs in document order.
+     * @return true when every posting was written successfully.
+     */
+    bool saveTermPositionsBatch(
+        int file_id,
+        const std::vector<std::pair<std::string, int>>& tokens
+    );
 
     /** @brief Look up file metadata by exact path. */
     std::optional<FileMetadata> findByPath(const std::string& path);

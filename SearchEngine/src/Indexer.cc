@@ -20,14 +20,7 @@ bool Indexer::indexFile(int file_id, const std::string& content) {
         return false;
     }
 
-    for (const auto& [term, position] : tokens) {
-        if (!repository_.saveTermPosition(file_id, term, position)) {
-            std::cerr << "Failed to save token: " << term << "\n";
-            return false;
-        }
-    }
-
-    return true;
+    return repository_.saveTermPositionsBatch(file_id, tokens);
 }
 
 std::vector<std::pair<std::string, int>> Indexer::tokenize(const std::string& content) const {

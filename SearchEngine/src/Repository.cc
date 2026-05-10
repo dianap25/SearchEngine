@@ -10,6 +10,7 @@
 
 #include <ctime>
 #include <iostream>
+#include <unordered_map>
 
 Repository::Repository(sqlite3* db)
     : db_(db) {
@@ -154,6 +155,112 @@ int Repository::findOrCreateTerm(const std::string& term) {
 
     sqlite3_finalize(select_statement);
     return term_id;
+}
+
+bool Repository::saveTermPositionsBatch(
+    int file_id,
+    const std::vector<std::pair<std::string, int>>& tokens
+) {
+    if (tokens.empty()) {
+        return true;
+    }
+
+    sqlite3_stmt* insert_term_stmt = nullptr;
+    sqlite3_stmt* select_term_stmt = nullptr;
+    sqlite3_stmt* insert_posting_stmt = nullptr;
+
+    auto cleanup = [&]() {
+        sqlite3_finalize(insert_term_stmt);
+        sqlite3_finalize(select_term_stmt);
+        sqlite3_finalize(insert_posting_stmt);
+    };
+
+    if (sqlite3_prepare_v2(
+            db_,
+            "INSERT INTO terms(term) VALUES (?) ON CONFLICT(term) DO NOTHING;",
+            -1,
+            &insert_term_stmt,
+            nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to prepare insert-term statement: "
+                  << sqlite3_errmsg(db_) << "\n";
+        cleanup();
+        return false;
+    }
+
+    if (sqlite3_prepare_v2(
+            db_,
+            "SELECT id FROM terms WHERE term = ?;",
+            -1,
+            &select_term_stmt,
+            nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to prepare select-term statement: "
+                  << sqlite3_errmsg(db_) << "\n";
+        cleanup();
+        return false;
+    }
+
+    if (sqlite3_prepare_v2(
+            db_,
+            "INSERT INTO postings(term_id, file_id, position) VALUES (?, ?, ?);",
+            -1,
+            &insert_posting_stmt,
+            nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to prepare insert-posting statement: "
+                  << sqlite3_errmsg(db_) << "\n";
+        cleanup();
+        return false;
+    }
+
+    std::unordered_map<std::string, int> term_cache;
+    term_cache.reserve(tokens.size() / 2 + 1);
+
+    for (const auto& [term, position] : tokens) {
+        int term_id = -1;
+        auto cached = term_cache.find(term);
+        if (cached != term_cache.end()) {
+            term_id = cached->second;
+        } else {
+            sqlite3_reset(insert_term_stmt);
+            sqlite3_clear_bindings(insert_term_stmt);
+            sqlite3_bind_text(insert_term_stmt, 1, term.c_str(), -1, SQLITE_TRANSIENT);
+            int rc = sqlite3_step(insert_term_stmt);
+            if (rc != SQLITE_DONE) {
+                std::cerr << "Failed to insert term '" << term << "': "
+                          << sqlite3_errmsg(db_) << "\n";
+                cleanup();
+                return false;
+            }
+
+            sqlite3_reset(select_term_stmt);
+            sqlite3_clear_bindings(select_term_stmt);
+            sqlite3_bind_text(select_term_stmt, 1, term.c_str(), -1, SQLITE_TRANSIENT);
+            if (sqlite3_step(select_term_stmt) != SQLITE_ROW) {
+                std::cerr << "Failed to look up id of term '" << term << "': "
+                          << sqlite3_errmsg(db_) << "\n";
+                cleanup();
+                return false;
+            }
+            term_id = sqlite3_column_int(select_term_stmt, 0);
+            term_cache.emplace(term, term_id);
+        }
+
+        sqlite3_reset(insert_posting_stmt);
+        sqlite3_clear_bindings(insert_posting_stmt);
+        sqlite3_bind_int(insert_posting_stmt, 1, term_id);
+        sqlite3_bind_int(insert_posting_stmt, 2, file_id);
+        sqlite3_bind_int(insert_posting_stmt, 3, position);
+
+        if (sqlite3_step(insert_posting_stmt) != SQLITE_DONE) {
+            std::cerr << "Failed to insert posting (term='" << term
+                      << "', pos=" << position << "): "
+                      << sqlite3_errmsg(db_) << "\n";
+            cleanup();
+            return false;
+        }
+    }
+
+    cleanup();
+    return true;
 }
 
 bool Repository::saveTermPosition(int file_id, const std::string& term, int position) {
