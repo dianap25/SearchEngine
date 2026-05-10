@@ -9,3 +9,6 @@ Testing/
 # Generated index databases
 *.db
 index.db
+
+# Generated Doxygen documentation
+docs/

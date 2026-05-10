@@ -112,3 +112,53 @@ Lub bezpośrednio:
 ```bash
 ./tests/unit_tests
 ```
+
+## Generowanie dokumentacji
+
+Cały kod ma komentarze w formacie Doxygen (bloki `@brief`, `@param`, `@return` przy klasach i metodach publicznych), więc dokumentację HTML można wygenerować jednym poleceniem.
+
+### Wymagania
+
+* **Doxygen** (≥ 1.9)
+* **Graphviz** — opcjonalny, do rysowania diagramów dziedziczenia i zależności (`HAVE_DOT = YES` w `Doxyfile`)
+
+#### Instalacja zależności
+
+macOS (Homebrew):
+
+```bash
+brew install doxygen graphviz
+```
+
+Linux (Debian / Ubuntu):
+
+```bash
+sudo apt install doxygen graphviz
+```
+
+### Generowanie
+
+W katalogu `SearchEngine/` znajduje się gotowy plik konfiguracyjny [Doxyfile](Doxyfile). Aby wygenerować dokumentację, wystarczy uruchomić:
+
+```bash
+cd SearchEngine
+doxygen Doxyfile
+```
+
+Wynik zostanie zapisany w katalogu `docs/html/`. Stronę startową otwieramy w przeglądarce:
+
+```bash
+open docs/html/index.html      # macOS
+xdg-open docs/html/index.html  # Linux
+```
+
+Strona główna dokumentacji to ten właśnie `README.md` (opcja `USE_MDFILE_AS_MAINPAGE` w Doxyfile). Z bocznego menu można nawigować do listy klas, plików nagłówkowych, hierarchii dziedziczenia (`Extractor` → `TextExtractor` / `PdfExtractor`) oraz źródeł z linkami między symbolami.
+
+### Czysty start
+
+Katalog `docs/` jest ignorowany przez `.gitignore`. Aby przeregenerować dokumentację od zera:
+
+```bash
+rm -rf docs
+doxygen Doxyfile
+```
