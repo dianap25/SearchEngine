@@ -117,6 +117,11 @@ int Application::handleRefresh(const std::string& path) {
     Database db;
     if (!db.open("index.db")) return 1;
 
+    if (!db.initializeSchema()) {
+        std::cerr << "Cannot initialize database schema\n";
+        return 1;
+    }
+
     RefreshEngine engine;
     engine.refresh(path, db);
 

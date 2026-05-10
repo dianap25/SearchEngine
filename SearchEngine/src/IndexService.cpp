@@ -4,6 +4,7 @@
 #include "IndexService.h"
 
 #include "Extractor.h"
+#include "Hasher.h"
 #include "Indexer.h"
 #include "Repository.h"
 #include "Scanner.h"
@@ -44,7 +45,10 @@ IndexSummary IndexService::indexDirectory(const std::string& rootPath) {
             continue;
         }
 
-        int fileId = repository.saveFileMetadata(file);
+        FileMetadata file_with_hash = file;
+        file_with_hash.contentHash = Hasher::sha256(content);
+
+        int fileId = repository.saveFileMetadata(file_with_hash);
 
         if (fileId < 0) {
             std::cerr << "Failed to save file metadata: " << file.path << "\n";

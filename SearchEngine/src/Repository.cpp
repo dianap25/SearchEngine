@@ -43,14 +43,15 @@ bool Repository::executeSql(const std::string& sql) {
 
 int Repository::saveFileMetadata(const FileMetadata& metadata) {
     const char* sql = R"(
-        INSERT INTO files(path, name, extension, size, modified_time, indexed_at)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO files(path, name, extension, size, modified_time, indexed_at, content_hash)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(path) DO UPDATE SET
             name = excluded.name,
             extension = excluded.extension,
             size = excluded.size,
             modified_time = excluded.modified_time,
-            indexed_at = excluded.indexed_at
+            indexed_at = excluded.indexed_at,
+            content_hash = excluded.content_hash
         RETURNING id;
     )";
 
@@ -69,6 +70,7 @@ int Repository::saveFileMetadata(const FileMetadata& metadata) {
     sqlite3_bind_int64(statement, 4, static_cast<sqlite3_int64>(metadata.size));
     sqlite3_bind_int64(statement, 5, static_cast<sqlite3_int64>(metadata.modifiedTime));
     sqlite3_bind_int64(statement, 6, static_cast<sqlite3_int64>(now));
+    sqlite3_bind_text(statement, 7, metadata.contentHash.c_str(), -1, SQLITE_TRANSIENT);
 
     int fileId = -1;
 
@@ -187,7 +189,7 @@ bool Repository::saveTermPosition(int fileId, const std::string& term, int posit
 
 std::optional<FileMetadata> Repository::findByPath(const std::string& path) {
     const char* sql = R"(
-        SELECT path, name, extension, size, modified_time
+        SELECT id, path, name, extension, size, modified_time, content_hash
         FROM files
         WHERE path = ?;
     )";
@@ -204,11 +206,16 @@ std::optional<FileMetadata> Repository::findByPath(const std::string& path) {
 
     if (sqlite3_step(statement) == SQLITE_ROW) {
         FileMetadata metadata;
-        metadata.path = reinterpret_cast<const char*>(sqlite3_column_text(statement, 0));
-        metadata.name = reinterpret_cast<const char*>(sqlite3_column_text(statement, 1));
-        metadata.extension = reinterpret_cast<const char*>(sqlite3_column_text(statement, 2));
-        metadata.size = static_cast<std::uintmax_t>(sqlite3_column_int64(statement, 3));
-        metadata.modifiedTime = static_cast<std::int64_t>(sqlite3_column_int64(statement, 4));
+        metadata.id = sqlite3_column_int(statement, 0);
+        metadata.path = reinterpret_cast<const char*>(sqlite3_column_text(statement, 1));
+        metadata.name = reinterpret_cast<const char*>(sqlite3_column_text(statement, 2));
+        metadata.extension = reinterpret_cast<const char*>(sqlite3_column_text(statement, 3));
+        metadata.size = static_cast<std::uintmax_t>(sqlite3_column_int64(statement, 4));
+        metadata.modifiedTime = static_cast<std::int64_t>(sqlite3_column_int64(statement, 5));
+        const unsigned char* hash_text = sqlite3_column_text(statement, 6);
+        if (hash_text != nullptr) {
+            metadata.contentHash = reinterpret_cast<const char*>(hash_text);
+        }
 
         result = metadata;
     }
@@ -252,7 +259,7 @@ std::optional<std::string> Repository::findTextByPath(const std::string& path) {
 
 std::vector<FileMetadata> Repository::findAllFiles() {
     const char* sql = R"(
-        SELECT path, name, extension, size, modified_time
+        SELECT id, path, name, extension, size, modified_time, content_hash
         FROM files;
     )";
 
@@ -265,11 +272,16 @@ std::vector<FileMetadata> Repository::findAllFiles() {
 
     while (sqlite3_step(statement) == SQLITE_ROW) {
         FileMetadata metadata;
-        metadata.path = reinterpret_cast<const char*>(sqlite3_column_text(statement, 0));
-        metadata.name = reinterpret_cast<const char*>(sqlite3_column_text(statement, 1));
-        metadata.extension = reinterpret_cast<const char*>(sqlite3_column_text(statement, 2));
-        metadata.size = static_cast<std::uintmax_t>(sqlite3_column_int64(statement, 3));
-        metadata.modifiedTime = static_cast<std::int64_t>(sqlite3_column_int64(statement, 4));
+        metadata.id = sqlite3_column_int(statement, 0);
+        metadata.path = reinterpret_cast<const char*>(sqlite3_column_text(statement, 1));
+        metadata.name = reinterpret_cast<const char*>(sqlite3_column_text(statement, 2));
+        metadata.extension = reinterpret_cast<const char*>(sqlite3_column_text(statement, 3));
+        metadata.size = static_cast<std::uintmax_t>(sqlite3_column_int64(statement, 4));
+        metadata.modifiedTime = static_cast<std::int64_t>(sqlite3_column_int64(statement, 5));
+        const unsigned char* hash_text = sqlite3_column_text(statement, 6);
+        if (hash_text != nullptr) {
+            metadata.contentHash = reinterpret_cast<const char*>(hash_text);
+        }
 
         files.push_back(metadata);
     }

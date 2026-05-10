@@ -16,10 +16,11 @@ add_executable(unit_tests
     ../src/Repository.cpp
     ../src/Indexer.cpp
     ../src/ContextBuilder.cpp
+    ../src/Hasher.cpp
 )
 
 target_include_directories(unit_tests PRIVATE ../include)
-target_link_libraries(unit_tests PRIVATE GTest::gtest GTest::gtest_main SQLite::SQLite3)
+target_link_libraries(unit_tests PRIVATE GTest::gtest GTest::gtest_main SQLite::SQLite3 OpenSSL::SSL OpenSSL::Crypto)
 
 include(GoogleTest)
 gtest_discover_tests(unit_tests)

@@ -14,6 +14,11 @@
 #include <iostream>
 
 void RefreshEngine::refresh(const std::string& rootPath, Database& db) {
+    if (!db.initializeSchema()) {
+        std::cerr << "Failed to initialize schema before refresh\n";
+        return;
+    }
+
     Scanner scanner;
     Extractor extractor;
 
@@ -59,6 +64,11 @@ void RefreshEngine::refresh(const std::string& rootPath, Database& db) {
 
         FileMetadata& dbFile = it->second;
         if (dbFile.contentHash != hash) {
+            FileMetadata updated = fsFile;
+            updated.id = dbFile.id;
+            updated.contentHash = hash;
+            repo.saveFileMetadata(updated);
+
             repo.deleteIndexForFile(dbFile.id);
             repo.saveFileText(dbFile.id, content);
             indexer.indexFile(dbFile.id, content);

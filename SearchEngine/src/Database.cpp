@@ -55,7 +55,8 @@ bool Database::initializeSchema() {
             extension TEXT,
             size INTEGER NOT NULL,
             modified_time INTEGER NOT NULL,
-            indexed_at INTEGER NOT NULL
+            indexed_at INTEGER NOT NULL,
+            content_hash TEXT NOT NULL DEFAULT ''
         );
 
         CREATE TABLE IF NOT EXISTS terms (
@@ -90,7 +91,33 @@ bool Database::initializeSchema() {
             ON postings(term_id, file_id);
     )";
 
-    return executeSql(sql);
+    if (!executeSql(sql)) {
+        return false;
+    }
+
+    // Light migration for older databases that predate the content_hash column.
+    // sqlite3_exec returns SQLITE_ERROR with the message "duplicate column name"
+    // when the column already exists; that case is intentionally ignored.
+    char* alter_error = nullptr;
+    int alter_rc = sqlite3_exec(
+        db_,
+        "ALTER TABLE files ADD COLUMN content_hash TEXT NOT NULL DEFAULT '';",
+        nullptr,
+        nullptr,
+        &alter_error
+    );
+
+    if (alter_rc != SQLITE_OK) {
+        const std::string message = alter_error != nullptr ? alter_error : "";
+        sqlite3_free(alter_error);
+
+        if (message.find("duplicate column") == std::string::npos) {
+            std::cerr << "Schema migration failed: " << message << "\n";
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool Database::executeSql(const std::string& sql) {
