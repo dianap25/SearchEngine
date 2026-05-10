@@ -1,10 +1,10 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Implementation of PdfExtractor. Calls pdftotext as a
-// child process via fork + execvp; the file path is placed in argv
-// directly so it never reaches a shell.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Implementacja klasy PdfExtractor. Uruchamia pdftotext jako
+// proces potomny przez fork + execvp; ścieżka pliku trafia
+// bezpośrednio do argv, więc nigdy nie przechodzi przez powłokę.
 //
-// No shell -- argv passed directly to pdftotext to avoid command
-// injection.
+// Bez powłoki -- argv przekazywane bezpośrednio do pdftotext, aby
+// uniknąć command injection.
 
 #include "PdfExtractor.h"
 
@@ -74,14 +74,15 @@ ExtractResult PdfExtractor::extract(const std::string& file_path) const {
     }
 
     if (pid == 0) {
-        // Child: redirect stdout to the pipe and exec pdftotext.
+        // Proces potomny: przekierowuje stdout do potoku i uruchamia
+        // pdftotext.
         ::close(pipe_fds[kReadEnd]);
         if (::dup2(pipe_fds[kWriteEnd], STDOUT_FILENO) < 0) {
             ::_exit(127);
         }
         ::close(pipe_fds[kWriteEnd]);
 
-        // pdftotext <file_path> -   (write text to stdout)
+        // pdftotext <file_path> -   (wypisuje tekst na stdout)
         std::string mutable_path = file_path;
         std::vector<char*> argv;
         argv.push_back(const_cast<char*>("pdftotext"));
@@ -93,7 +94,8 @@ ExtractResult PdfExtractor::extract(const std::string& file_path) const {
         ::_exit(127);
     }
 
-    // Parent: read child's stdout, then wait.
+    // Proces nadrzędny: czyta stdout potomka, potem czeka na
+    // jego zakończenie.
     ::close(pipe_fds[kWriteEnd]);
     ExtractResult result = readChildStdout(pipe_fds[kReadEnd]);
     ::close(pipe_fds[kReadEnd]);

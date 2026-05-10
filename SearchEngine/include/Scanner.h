@@ -1,7 +1,7 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Recursive directory scanner. Walks the filesystem and
-// builds FileMetadata records for files with supported extensions
-// (.txt, .tex, .pdf, no extension).
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Rekurencyjny skaner katalogów. Przechodzi drzewo katalogów
+// i buduje rekordy FileMetadata dla plików o obsługiwanych
+// rozszerzeniach (.txt, .tex, .pdf, brak rozszerzenia).
 
 #pragma once
 
@@ -12,15 +12,15 @@
 #include <vector>
 
 /**
- * @brief Walks a directory tree and emits FileMetadata for indexable
- *        files.
+ * @brief Przechodzi drzewo katalogów i emituje FileMetadata dla
+ *        plików nadających się do indeksowania.
  */
 class Scanner {
 public:
     /**
-     * @brief Recursively scan a directory.
-     * @param root_path Top-level directory.
-     * @return Metadata for every supported regular file.
+     * @brief Rekurencyjnie skanuje katalog.
+     * @param root_path Katalog najwyższego poziomu.
+     * @return Metadane każdego obsługiwanego, zwykłego pliku.
      */
     std::vector<FileMetadata> scan(const std::string& root_path);
 

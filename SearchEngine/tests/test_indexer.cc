@@ -1,7 +1,7 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Unit tests for Indexer. Cover token normalization and
-// the end-to-end "save text + index file" flow against an in-memory
-// database.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Testy jednostkowe klasy Indexer. Pokrywają normalizację
+// tokenów oraz pełny przepływ "zapis tekstu + indeksacja pliku" na
+// bazie SQLite w pamięci.
 
 #include <gtest/gtest.h>
 

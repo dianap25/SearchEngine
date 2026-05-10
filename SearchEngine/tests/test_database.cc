@@ -1,7 +1,7 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Unit tests for Database. Cover open(), schema
-// initialization, and verify that all required tables and indexes are
-// created by initializeSchema().
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Testy jednostkowe klasy Database. Pokrywają open(),
+// inicjalizację schematu i weryfikują, że wszystkie wymagane tabele
+// oraz indeksy zostały utworzone przez initializeSchema().
 
 #include <gtest/gtest.h>
 

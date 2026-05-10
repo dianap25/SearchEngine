@@ -1,22 +1,23 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Top-level CLI dispatcher. Parses argv, maps commands
-// (index/refresh/search-name/search-content) to the right service and
-// prints a friendly usage screen when no command is provided.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Główny dyspozytor CLI. Parsuje argv, mapuje polecenia
+// (index/refresh/search-name/search-content) na odpowiednie usługi i
+// wyświetla przyjazny ekran pomocy, gdy nie podano żadnego
+// polecenia.
 
 #pragma once
 
 #include <string>
 
 /**
- * @brief Entry point of the SearchEngine CLI.
+ * @brief Punkt wejścia CLI aplikacji SearchEngine.
  */
 class Application {
 public:
     /**
-     * @brief Run the CLI with command-line arguments.
-     * @param argc argv count.
-     * @param argv argv strings.
-     * @return Process exit code.
+     * @brief Uruchamia CLI z argumentami wiersza poleceń.
+     * @param argc Liczba argumentów argv.
+     * @param argv Argumenty wiersza poleceń.
+     * @return Kod wyjścia procesu.
      */
     int run(int argc, char** argv);
 

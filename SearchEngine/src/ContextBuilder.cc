@@ -1,8 +1,8 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Implementation of ContextBuilder. Performs a
-// case-insensitive search by lowering both buffers, then returns a
-// substring of the original text clamped to the file boundaries so
-// the result preserves the original casing.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Implementacja klasy ContextBuilder. Wyszukiwanie niewrażliwe
+// na wielkość liter realizuje poprzez zlowercase'owanie obu buforów,
+// a następnie zwraca podciąg z oryginalnego tekstu obcięty do granic
+// pliku, dzięki czemu wynik zachowuje oryginalną wielkość liter.
 
 #include "ContextBuilder.h"
 

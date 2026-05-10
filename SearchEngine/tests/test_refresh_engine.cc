@@ -1,8 +1,8 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Unit tests for RefreshEngine. All scenarios run
-// against an in-memory SQLite database and a temporary directory on
-// disk so they exercise the refresh logic end-to-end without
-// touching production data.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Testy jednostkowe klasy RefreshEngine. Wszystkie scenariusze
+// uruchamiają się na bazie SQLite w pamięci oraz tymczasowym
+// katalogu na dysku, dzięki czemu logika refreshu jest sprawdzana
+// end-to-end bez dotykania danych produkcyjnych.
 
 #include <gtest/gtest.h>
 
@@ -124,8 +124,8 @@ TEST_F(RefreshEngineFixture, SecondRefreshIsNoOpWhenNothingChanged) {
     std::int64_t indexed_at_before = indexedAtFor(a.string());
     ASSERT_GT(indexed_at_before, 0);
 
-    // Bump wall-clock time so a hypothetical re-index would advance
-    // indexed_at and we can detect it.
+    // Przesuń zegar, żeby ewentualny re-index podniósł indexed_at i
+    // żebyśmy mogli to wykryć.
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
     RefreshEngine engine;
@@ -149,7 +149,7 @@ TEST_F(RefreshEngineFixture, ModifiedFileIsReIndexedTargetly) {
 
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
-    // Mutate only a.txt.
+    // Modyfikuj tylko a.txt.
     {
         std::ofstream stream(a);
         stream << "alpha gamma";

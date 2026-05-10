@@ -1,17 +1,17 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: PDF extractor. Spawns pdftotext as a child process
-// (no shell) and reads its stdout into a string.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Ekstraktor PDF. Uruchamia pdftotext jako proces potomny
+// (bez powłoki) i odczytuje jego stdout do bufora typu string.
 
 #pragma once
 
 #include "Extractor.h"
 
 /**
- * @brief Extractor strategy for PDF files.
+ * @brief Strategia ekstrakcji dla plików PDF.
  *
- * Calls pdftotext through fork+execvp so the file path is passed in
- * argv directly and never goes through a shell, which avoids any
- * command-injection issues.
+ * Wywołuje pdftotext przez fork+execvp, więc ścieżka pliku trafia
+ * bezpośrednio do argv i nigdy nie przechodzi przez powłokę, co
+ * eliminuje ryzyko command injection.
  */
 class PdfExtractor : public Extractor {
 public:

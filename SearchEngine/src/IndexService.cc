@@ -1,8 +1,9 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Implementation of IndexService. For each supported
-// file under the root directory it runs the full
-// extract -> save metadata -> save text -> index pipeline inside its
-// own transaction so a single failure does not corrupt the index.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Implementacja klasy IndexService. Dla każdego obsługiwanego
+// pliku pod katalogiem głównym uruchamia pełny pipeline
+// ekstrakcja -> zapis metadanych -> zapis tekstu -> indeksacja w
+// ramach własnej transakcji, dzięki czemu pojedyncze niepowodzenie
+// nie psuje całego indeksu.
 
 #include "IndexService.h"
 

@@ -1,7 +1,7 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Unit tests for Hasher::sha256. Cover the well-known
-// digest of the empty string, determinism on repeated input, and the
-// expectation that distinct inputs produce distinct digests.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Testy jednostkowe metody Hasher::sha256. Pokrywają znany
+// skrót pustego stringa, determinizm dla powtórzonego wejścia oraz
+// oczekiwanie, że różne wejścia produkują różne skróty.
 
 #include <gtest/gtest.h>
 
@@ -9,7 +9,7 @@
 
 namespace {
 
-// Reference digest for SHA-256 of the empty string, lowercase hex.
+// Wzorcowy skrót SHA-256 pustego stringa zapisany w hex (małe litery).
 constexpr const char* kSha256Empty =
     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
 

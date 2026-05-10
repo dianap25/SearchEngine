@@ -1,8 +1,7 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Unit test for IndexService. Builds a small directory
-// on the filesystem, runs the full index pipeline against it and
-// asserts both the IndexSummary counters and the resulting search
-// hit.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Test jednostkowy klasy IndexService. Tworzy mały katalog na
+// dysku, uruchamia na nim pełny pipeline indeksacji i sprawdza
+// zarówno liczniki IndexSummary, jak i wynik wyszukiwania.
 
 #include <gtest/gtest.h>
 

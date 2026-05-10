@@ -1,7 +1,8 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Helper that crops a short fragment of text around the
-// first case-insensitive occurrence of a search phrase. Used by the
-// CLI to display a snippet next to each search-content hit.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Pomocnik wycinający krótki fragment tekstu wokół pierwszego
+// wystąpienia szukanej frazy (porównywanie niezależne od wielkości
+// liter). Używany przez CLI do wyświetlenia kontekstu obok każdego
+// trafienia search-content.
 
 #pragma once
 
@@ -9,22 +10,22 @@
 #include <string>
 
 /**
- * @brief Builds short context windows around a phrase in text.
+ * @brief Buduje krótkie okna kontekstu wokół frazy w tekście.
  */
 class ContextBuilder {
 public:
     /**
-     * @brief Construct with a margin size in characters.
-     * @param margin_size Number of characters to include before and
-     *                    after the matched phrase. Defaults to 40.
+     * @brief Konstruuje obiekt z rozmiarem marginesu w znakach.
+     * @param margin_size Liczba znaków przed i po dopasowaniu, które
+     *                    mają znaleźć się w wyniku. Domyślnie 40.
      */
     explicit ContextBuilder(std::size_t margin_size = 40);
 
     /**
-     * @brief Return a fragment of @p text around the first
-     *        case-insensitive match of @p phrase.
-     * @return The matching fragment or an empty string when @p phrase
-     *         is not present.
+     * @brief Zwraca fragment @p text wokół pierwszego, niewrażliwego
+     *        na wielkość liter, wystąpienia @p phrase.
+     * @return Pasujący fragment albo pusty string, gdy @p phrase nie
+     *         występuje w tekście.
      */
     std::string build(const std::string& text, const std::string& phrase) const;
 

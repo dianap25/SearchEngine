@@ -1,6 +1,6 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Implementation of TextExtractor. Reads the file with
-// std::ifstream and returns its full content as a string.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Implementacja klasy TextExtractor. Czyta plik za pomocą
+// std::ifstream i zwraca jego pełną treść jako string.
 
 #include "TextExtractor.h"
 

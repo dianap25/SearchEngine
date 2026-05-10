@@ -1,8 +1,9 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Implementation of the Database wrapper around SQLite.
-// Owns the connection through a unique_ptr with a custom deleter so
-// sqlite3_close runs automatically on destruction; also handles
-// schema creation and the content_hash migration.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Implementacja opakowania klasy Database wokół SQLite.
+// Trzyma połączenie w std::unique_ptr z własnym deleterem, dzięki
+// czemu sqlite3_close wykonuje się automatycznie przy destrukcji;
+// odpowiada również za utworzenie schematu i migrację kolumny
+// content_hash.
 
 #include "Database.h"
 
@@ -107,10 +108,10 @@ bool Database::initializeSchema() {
         return false;
     }
 
-    // Lightweight migration for older databases predating the
-    // content_hash column. SQLite returns SQLITE_ERROR with the
-    // message "duplicate column name" when the column already exists;
-    // that case is intentionally ignored.
+    // Lekka migracja dla starszych baz, które powstały zanim
+    // pojawiła się kolumna content_hash. Gdy kolumna już istnieje,
+    // SQLite zwraca SQLITE_ERROR z komunikatem "duplicate column
+    // name"; ten przypadek świadomie ignorujemy.
     char* alter_error = nullptr;
     int alter_rc = sqlite3_exec(
         db_.get(),

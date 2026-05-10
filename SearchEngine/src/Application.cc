@@ -1,8 +1,8 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Implementation of the CLI dispatcher. Parses the
-// command name from argv, validates argument counts and dispatches to
-// the relevant handler. Also owns the help screen shown when the user
-// runs the binary with no arguments.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Implementacja dyspozytora CLI. Parsuje nazwę polecenia z
+// argv, weryfikuje liczbę argumentów i kieruje wywołanie do
+// odpowiedniego handlera. Posiada również ekran pomocy wyświetlany,
+// gdy program zostanie uruchomiony bez argumentów.
 
 #include "Application.h"
 

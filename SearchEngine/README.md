@@ -115,7 +115,7 @@ Lub bezpośrednio:
 
 ## Generowanie dokumentacji
 
-Cały kod ma komentarze w formacie Doxygen (bloki `@brief`, `@param`, `@return` przy klasach i metodach publicznych), więc dokumentację HTML można wygenerować jednym poleceniem.
+Cały kod ma komentarze w formacie Doxygen (bloki `@brief`, `@param`, `@return` przy klasach i metodach publicznych), co pozwala wygenerowac dokumentację HTML
 
 ### Wymagania
 
@@ -152,13 +152,4 @@ open docs/html/index.html      # macOS
 xdg-open docs/html/index.html  # Linux
 ```
 
-Strona główna dokumentacji to ten właśnie `README.md` (opcja `USE_MDFILE_AS_MAINPAGE` w Doxyfile). Z bocznego menu można nawigować do listy klas, plików nagłówkowych, hierarchii dziedziczenia (`Extractor` → `TextExtractor` / `PdfExtractor`) oraz źródeł z linkami między symbolami.
 
-### Czysty start
-
-Katalog `docs/` jest ignorowany przez `.gitignore`. Aby przeregenerować dokumentację od zera:
-
-```bash
-rm -rf docs
-doxygen Doxyfile
-```

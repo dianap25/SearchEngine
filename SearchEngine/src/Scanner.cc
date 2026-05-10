@@ -1,8 +1,8 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Implementation of Scanner. Walks the directory tree
-// with std::filesystem, filters by supported extensions and converts
-// the platform-dependent file_time_type into a Unix timestamp the
-// rest of the engine can store and compare.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Implementacja klasy Scanner. Przechodzi drzewo katalogów
+// przez std::filesystem, filtruje pliki po obsługiwanych
+// rozszerzeniach i konwertuje zależny od platformy file_time_type na
+// uniksowy timestamp, który reszta silnika może zapisać i porównywać.
 
 #include "Scanner.h"
 

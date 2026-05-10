@@ -1,7 +1,7 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Implementation of ExtractorFactory. Inspects the
-// file extension and returns the matching concrete Extractor; defaults
-// to TextExtractor for unknown extensions.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Implementacja klasy ExtractorFactory. Sprawdza rozszerzenie
+// pliku i zwraca pasujący konkretny ekstraktor; dla nieznanych
+// rozszerzeń domyślnie zwraca TextExtractor.
 
 #include "ExtractorFactory.h"
 

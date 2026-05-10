@@ -1,8 +1,8 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Incremental updater that walks the filesystem, hashes
-// each file and reconciles the index: new files are indexed, changed
-// files are re-indexed, and files that disappeared from disk are
-// removed from the database.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Inkrementalny aktualizator. Przechodzi system plików, liczy
+// hash każdego pliku i synchronizuje indeks: nowe pliki są
+// indeksowane, zmienione re-indeksowane, a pliki, które zniknęły z
+// dysku, są usuwane z bazy.
 
 #pragma once
 
@@ -11,17 +11,19 @@
 #include <string>
 
 /**
- * @brief Brings an already-built index back in sync with the disk.
+ * @brief Synchronizuje istniejący indeks z aktualnym stanem dysku.
  */
 class RefreshEngine {
 public:
     /**
-     * @brief Reconcile the on-disk tree at @p root_path with the index
-     *        in @p db.
-     * @param root_path Top-level directory previously indexed.
-     * @param db Database holding the index. The schema is initialized
-     *           on the first call so refresh works without a prior
-     *           index command.
+     * @brief Synchronizuje drzewo plików w @p root_path z indeksem
+     *        w bazie @p db.
+     * @param root_path Katalog najwyższego poziomu wcześniej
+     *                  zaindeksowany.
+     * @param db Baza zawierająca indeks. Schemat jest inicjalizowany
+     *           przy pierwszym wywołaniu, dzięki czemu refresh
+     *           działa również bez wcześniejszego użycia polecenia
+     *           "index".
      */
     void refresh(const std::string& root_path, Database& db);
 };

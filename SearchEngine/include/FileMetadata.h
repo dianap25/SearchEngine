@@ -1,8 +1,8 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Plain data describing a single file on disk plus the
-// derived state that the index keeps about it (database id, content
-// hash). Used as the shared exchange type between Scanner, Repository,
-// Indexer and RefreshEngine.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Struktura danych opisująca pojedynczy plik na dysku oraz
+// stan, jaki o tym pliku przechowuje indeks (id w bazie, hash
+// zawartości). Używana jako wspólny typ wymiany między klasami
+// Scanner, Repository, Indexer i RefreshEngine.
 
 #pragma once
 
@@ -10,12 +10,13 @@
 #include <string>
 
 /**
- * @brief Snapshot of a file as it appears on disk and in the index.
+ * @brief Migawka pliku w postaci, w jakiej istnieje na dysku oraz w
+ *        indeksie.
  *
- * Scanner fills the on-disk fields (path, name, extension, size,
- * modified_time). Repository fills @c id and @c content_hash from the
- * database. RefreshEngine compares hashes to decide whether to
- * re-index.
+ * Scanner wypełnia pola pochodzące z dysku (path, name, extension,
+ * size, modified_time). Repository wypełnia @c id i @c content_hash
+ * z bazy danych. RefreshEngine porównuje hashe, aby zdecydować, czy
+ * plik wymaga ponownej indeksacji.
  */
 struct FileMetadata {
     int id = 0;

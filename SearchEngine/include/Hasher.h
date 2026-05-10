@@ -1,22 +1,23 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Tiny SHA-256 helper around OpenSSL. Used by
-// IndexService and RefreshEngine to compute a content fingerprint so
-// refresh can skip unchanged files.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Drobny pomocnik liczący SHA-256 oparty na bibliotece OpenSSL.
+// Używany przez IndexService oraz RefreshEngine do wyliczenia
+// fingerprintu treści, dzięki czemu refresh może pominąć
+// niezmienione pliki.
 
 #pragma once
 
 #include <string>
 
 /**
- * @brief Stateless wrapper that returns the SHA-256 hex digest of a
- *        string buffer.
+ * @brief Bezstanowe opakowanie zwracające szesnastkowy skrót SHA-256
+ *        z bufora typu string.
  */
 class Hasher {
 public:
     /**
-     * @brief Compute the SHA-256 hex digest of @p data.
-     * @param data Input buffer (treated as raw bytes).
-     * @return Lowercase hex digest, 64 characters long.
+     * @brief Liczy szesnastkowy skrót SHA-256 z bufora @p data.
+     * @param data Wejściowy bufor (traktowany jako surowe bajty).
+     * @return Skrót w postaci 64-znakowego ciągu hex (małe litery).
      */
     static std::string sha256(const std::string& data);
 };

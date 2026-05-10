@@ -1,8 +1,7 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: SQL-facing interface around the index database. All
-// reads and writes against files, file_texts, terms and postings
-// tables happen here so the rest of the engine can stay free of raw
-// SQL.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Warstwa dostępu do bazy. Wszystkie odczyty i zapisy do tabel
+// files, file_texts, terms i postings są wykonywane tutaj, aby
+// pozostała część silnika nie musiała znać surowego SQL.
 
 #pragma once
 
@@ -17,11 +16,12 @@
 struct sqlite3;
 
 /**
- * @brief Persistence layer for files, file_texts, terms and postings.
+ * @brief Warstwa trwałości dla tabel files, file_texts, terms oraz
+ *        postings.
  *
- * The instance does not own the connection; the caller (typically a
- * Database owner) keeps the sqlite3* alive for the lifetime of the
- * Repository.
+ * Repository nie posiada na własność połączenia; to wywołujący
+ * (zwykle właściciel klasy Database) gwarantuje, że uchwyt sqlite3*
+ * przeżyje obiekt Repository.
  */
 class Repository {
 public:
@@ -32,74 +32,79 @@ public:
     Repository(Repository&&) = default;
     Repository& operator=(Repository&&) = default;
 
-    /** @brief Begin a SQL transaction. @return true on success. */
+    /** @brief Rozpoczyna transakcję SQL. @return true jeśli się powiedzie. */
     bool beginTransaction();
-    /** @brief Commit the open SQL transaction. */
+    /** @brief Zatwierdza otwartą transakcję SQL. */
     bool commitTransaction();
-    /** @brief Roll back the open SQL transaction. */
+    /** @brief Wycofuje otwartą transakcję SQL. */
     bool rollbackTransaction();
 
     /**
-     * @brief Insert or update a row in the files table.
-     * @param metadata Metadata for the file (id may be zero on insert).
-     * @return Numeric id of the row, or -1 on failure.
+     * @brief Wstawia lub aktualizuje wiersz w tabeli files.
+     * @param metadata Metadane pliku (id może być zerowe przy
+     *                 wstawianiu nowego rekordu).
+     * @return Liczbowe id wiersza albo -1 w razie niepowodzenia.
      */
     int saveFileMetadata(const FileMetadata& metadata);
 
     /**
-     * @brief Replace the cached extracted text for a file.
-     * @param file_id Database id of the file.
-     * @param content Extracted text to store.
+     * @brief Zastępuje zapamiętany tekst pliku w cache.
+     * @param file_id Id pliku w bazie.
+     * @param content Wydobyty tekst do zapisania.
      */
     bool saveFileText(int file_id, const std::string& content);
 
     /**
-     * @brief Append a single (term, position) pair to postings.
+     * @brief Dopisuje pojedynczą parę (term, position) do postings.
      *
-     * Prefer saveTermPositionsBatch when writing more than a handful
-     * of postings -- this method prepares two statements per call.
+     * W przypadku zapisu większej liczby postingów warto użyć
+     * saveTermPositionsBatch — ta metoda przygotowuje dwa
+     * zapytania na każde wywołanie.
      *
-     * @param file_id Database id of the file.
-     * @param term Normalized term string.
-     * @param position Token position within the file.
+     * @param file_id Id pliku w bazie.
+     * @param term Znormalizowany term.
+     * @param position Pozycja tokenu w pliku.
      */
-    [[deprecated("Use saveTermPositionsBatch for files with more than a few tokens.")]]
+    [[deprecated("Dla plików z większą liczbą tokenów użyj saveTermPositionsBatch.")]]
     bool saveTermPosition(int file_id, const std::string& term, int position);
 
     /**
-     * @brief Insert all postings for a single file using prepared
-     *        statements and a per-file term cache.
+     * @brief Wstawia wszystkie postingi dla jednego pliku, używając
+     *        prepared statementów oraz cache'a termów dla danego
+     *        pliku.
      *
-     * Prepares the term-insert, term-select and posting-insert
-     * statements once, then iterates the @p tokens vector binding,
-     * stepping and resetting each one. Repeated terms within a single
-     * file are resolved from an in-memory cache to avoid extra
-     * round-trips to the terms table.
+     * Przygotowuje statementy term-insert, term-select oraz
+     * posting-insert dokładnie raz, a następnie iteruje po wektorze
+     * @p tokens, bindując, wykonując i resetując każdy z nich.
+     * Powtórzone termy w tym samym pliku są rozwiązywane przez
+     * cache w pamięci, co eliminuje dodatkowe odpytywanie tabeli
+     * terms.
      *
-     * @param file_id Database id of the file.
-     * @param tokens (normalized term, position) pairs in document order.
-     * @return true when every posting was written successfully.
+     * @param file_id Id pliku w bazie.
+     * @param tokens Pary (znormalizowany term, pozycja) w kolejności
+     *               występowania w dokumencie.
+     * @return true jeśli każdy posting został zapisany poprawnie.
      */
     bool saveTermPositionsBatch(
         int file_id,
         const std::vector<std::pair<std::string, int>>& tokens
     );
 
-    /** @brief Look up file metadata by exact path. */
+    /** @brief Wyszukuje metadane pliku po dokładnej ścieżce. */
     std::optional<FileMetadata> findByPath(const std::string& path);
-    /** @brief Look up extracted text by exact path. */
+    /** @brief Wyszukuje wydobyty tekst po dokładnej ścieżce. */
     std::optional<std::string> findTextByPath(const std::string& path);
-    /** @brief Return metadata for every file currently indexed. */
+    /** @brief Zwraca metadane wszystkich aktualnie zaindeksowanych plików. */
     std::vector<FileMetadata> findAllFiles();
 
-    /** @brief Remove a file row (cascades to postings/file_texts). */
+    /** @brief Usuwa wiersz z tabeli files (kaskaduje na postings/file_texts). */
     bool deleteFileByPath(const std::string& path);
-    /** @brief Drop all postings belonging to a single file. */
+    /** @brief Usuwa wszystkie postingi należące do jednego pliku. */
     bool deleteIndexForFile(int file_id);
 
-    /** @brief Search files by case-insensitive substring of name. */
+    /** @brief Wyszukuje pliki po fragmencie nazwy (case-insensitive). */
     std::vector<SearchResult> searchByName(const std::string& phrase);
-    /** @brief Search files by exact normalized term in their content. */
+    /** @brief Wyszukuje pliki po dokładnym, znormalizowanym termie w treści. */
     std::vector<SearchResult> searchByContent(const std::string& term);
 
 private:

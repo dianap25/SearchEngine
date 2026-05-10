@@ -1,7 +1,8 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Unit tests for Scanner. Cover positive scans against
-// the sample_data fixture, metadata population, supported-extension
-// filtering, and graceful handling of missing directories.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Testy jednostkowe klasy Scanner. Pokrywają poprawne skany
+// fixtury sample_data, wypełnianie metadanych, filtrowanie po
+// obsługiwanych rozszerzeniach oraz spokojne radzenie sobie z
+// nieistniejącymi katalogami.
 
 #include <gtest/gtest.h>
 

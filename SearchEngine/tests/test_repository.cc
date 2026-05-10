@@ -1,7 +1,8 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Unit tests for Repository. Drive an in-memory SQLite
-// database through the public API and assert that file metadata,
-// extracted text and search-by-name behave as documented.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Testy jednostkowe klasy Repository. Sterują bazą SQLite
+// w pamięci przez publiczne API i sprawdzają, czy metadane plików,
+// wydobyty tekst oraz wyszukiwanie po nazwie zachowują się zgodnie
+// z dokumentacją.
 
 #include <gtest/gtest.h>
 

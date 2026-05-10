@@ -1,7 +1,8 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: High-level orchestration of a single index run. Wires
-// together Scanner, Extractor, Repository and Indexer behind a
-// single indexDirectory() entry point used by the index CLI command.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Wysokopoziomowa orkiestracja jednego przebiegu indeksacji.
+// Spina ze sobą Scanner, Extractor, Repository i Indexer pod jednym
+// punktem wejścia indexDirectory(), używanym przez polecenie CLI
+// "index".
 
 #pragma once
 
@@ -11,17 +12,19 @@
 #include <string>
 
 /**
- * @brief Indexes every supported file under a directory in one
- *        transaction-per-file pass.
+ * @brief Indeksuje każdy obsługiwany plik w katalogu w trybie
+ *        "transakcja na plik".
  */
 class IndexService {
 public:
     explicit IndexService(Database& database);
 
     /**
-     * @brief Walk @p root_path, extract content, and index everything.
-     * @param root_path Directory to scan recursively.
-     * @return Counters describing the run (scanned, indexed, skipped, failed).
+     * @brief Przechodzi @p root_path, ekstrahuje treść i indeksuje
+     *        wszystko.
+     * @param root_path Katalog do przeskanowania rekurencyjnie.
+     * @return Liczniki opisujące przebieg (przeskanowane,
+     *         zaindeksowane, pominięte, błędne).
      */
     IndexSummary indexDirectory(const std::string& root_path);
 

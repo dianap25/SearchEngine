@@ -1,9 +1,9 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Thin RAII wrapper around an SQLite connection. Owns
-// the sqlite3 handle through std::unique_ptr with a custom deleter,
-// exposes a connection() accessor for Repository, and runs the
-// schema bootstrap (including the content_hash migration) used by
-// index/refresh.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Cienkie opakowanie RAII na połączenie z bazą SQLite.
+// Posiada uchwyt sqlite3 trzymany w std::unique_ptr z własnym
+// deleterem, udostępnia metodę connection() dla klasy Repository
+// oraz odpowiada za inicjalizację schematu (wraz z migracją kolumny
+// content_hash) używanego przez polecenia index/refresh.
 
 #pragma once
 
@@ -13,13 +13,13 @@
 struct sqlite3;
 
 /**
- * @brief Owns the SQLite connection and creates/migrates the schema.
+ * @brief Posiada połączenie z SQLite oraz tworzy/migruje schemat.
  *
- * The connection is held in a std::unique_ptr with a custom deleter,
- * so closing happens automatically when the Database goes out of
- * scope. The class is explicitly non-copyable; move construction and
- * move assignment are defaulted so a Database can be returned from
- * factory functions.
+ * Połączenie jest trzymane w std::unique_ptr z własnym deleterem,
+ * dzięki czemu zamknięcie następuje automatycznie, gdy obiekt
+ * Database wychodzi z zakresu. Klasa jest jawnie niekopiowalna;
+ * konstrukcja przenosząca i przypisanie przenoszące są domyślne,
+ * więc Database może być zwracany z funkcji wytwórczych.
  */
 class Database {
 public:
@@ -31,21 +31,22 @@ public:
     Database& operator=(Database&&) = default;
 
     /**
-     * @brief Open an SQLite database file (or ":memory:" for tests).
-     * @param path File path or special SQLite URI.
-     * @return true when the connection was opened successfully.
+     * @brief Otwiera plik bazy SQLite (lub ":memory:" w testach).
+     * @param path Ścieżka do pliku albo specjalny URI SQLite.
+     * @return true jeśli połączenie zostało otwarte poprawnie.
      */
     bool open(const std::string& path);
 
     /**
-     * @brief Create the schema and apply any pending migrations.
-     * @return true when the schema is ready to use.
+     * @brief Tworzy schemat bazy i wykonuje oczekujące migracje.
+     * @return true jeśli schemat jest gotowy do użycia.
      */
     bool initializeSchema();
 
     /**
-     * @brief Raw connection used by Repository.
-     * @return Pointer owned by this Database; do not free.
+     * @brief Surowy uchwyt połączenia używany przez Repository.
+     * @return Wskaźnik własnościowy tego obiektu Database; nie należy
+     *         go zwalniać.
      */
     sqlite3* connection();
 

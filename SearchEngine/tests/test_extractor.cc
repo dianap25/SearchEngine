@@ -1,8 +1,9 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Unit tests for the Extractor strategy hierarchy. Cover
-// TextExtractor end-to-end against the sample_data fixture, and
-// PdfExtractor against the same path; the PDF case is skipped when
-// pdftotext is not on PATH so the suite stays portable.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Testy jednostkowe hierarchii ekstraktorów. Pokrywają
+// TextExtractor end-to-end na fixturze sample_data oraz
+// PdfExtractor na tej samej ścieżce; przypadek PDF jest pomijany,
+// gdy pdftotext nie jest dostępny w PATH, żeby zestaw testów
+// pozostał przenośny.
 
 #include <gtest/gtest.h>
 

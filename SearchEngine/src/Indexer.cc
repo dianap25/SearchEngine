@@ -1,7 +1,7 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Implementation of Indexer. Splits text on whitespace,
-// normalizes each token (lowercase ASCII alphanumerics only) and
-// asks the Repository to persist the resulting postings.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Implementacja klasy Indexer. Dzieli tekst na białych
+// znakach, normalizuje każdy token (zostawia tylko małe litery i
+// cyfry ASCII) i prosi Repository o utrwalenie powstałych postingów.
 
 #include "Indexer.h"
 

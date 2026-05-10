@@ -1,8 +1,8 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Implementation of RefreshEngine. Compares disk and
-// database side by side: scans the directory, loads the existing
-// metadata, hashes every file's content and then applies the minimal
-// set of changes needed to bring the index back in sync.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Implementacja klasy RefreshEngine. Porównuje stan dysku ze
+// stanem bazy: skanuje katalog, wczytuje istniejące metadane, liczy
+// hash treści każdego pliku, a następnie wykonuje minimalny zbiór
+// zmian potrzebnych, aby przywrócić zgodność indeksu z dyskiem.
 
 #include "RefreshEngine.h"
 

@@ -1,6 +1,6 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Process entry point. Constructs the Application object
-// and forwards argv to it. All real logic lives in Application::run.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Punkt wejścia procesu. Tworzy obiekt Application i przekazuje
+// mu argv. Cała właściwa logika znajduje się w Application::run.
 
 #include "Application.h"
 

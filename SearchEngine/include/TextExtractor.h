@@ -1,17 +1,18 @@
-// Authors: Alesia Filinkova, Diana Pelin
-// Description: Plain-text extractor. Reads the file directly from
-// disk; suitable for .txt, .tex and files without an extension.
+// Autorzy: Alesia Filinkova, Diana Pelin
+// Opis: Ekstraktor zwykłego tekstu. Czyta plik bezpośrednio z dysku;
+// odpowiedni dla rozszerzeń .txt, .tex oraz plików bez rozszerzenia.
 
 #pragma once
 
 #include "Extractor.h"
 
 /**
- * @brief Extractor strategy for plain text files.
+ * @brief Strategia ekstrakcji dla plików tekstowych.
  *
- * Reads the file with std::ifstream and returns its full content.
- * Returns a failure result for missing or empty files so the caller
- * can keep return-code-style error handling.
+ * Czyta plik za pomocą std::ifstream i zwraca jego pełną treść.
+ * Zwraca wynik niepowodzenia dla plików nieistniejących lub pustych,
+ * tak aby wywołujący mogli pozostać przy obsłudze błędów opartej na
+ * kodach powrotu.
  */
 class TextExtractor : public Extractor {
 public:
