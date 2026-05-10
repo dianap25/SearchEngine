@@ -1,11 +1,13 @@
 // Authors: Alesia Filinkova, Diana Pelin
 // Description: Thin RAII wrapper around an SQLite connection. Owns
-// the sqlite3 handle, exposes a connection() accessor for Repository
-// and runs the schema bootstrap (including the content_hash
-// migration) used by index/refresh.
+// the sqlite3 handle through std::unique_ptr with a custom deleter,
+// exposes a connection() accessor for Repository, and runs the
+// schema bootstrap (including the content_hash migration) used by
+// index/refresh.
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 struct sqlite3;
@@ -13,14 +15,15 @@ struct sqlite3;
 /**
  * @brief Owns the SQLite connection and creates/migrates the schema.
  *
- * The class is non-copyable so the underlying connection has a single
- * owner. Move construction/assignment is defaulted so a Database can
- * be returned from factory functions.
+ * The connection is held in a std::unique_ptr with a custom deleter,
+ * so closing happens automatically when the Database goes out of
+ * scope. The class is explicitly non-copyable; move construction and
+ * move assignment are defaulted so a Database can be returned from
+ * factory functions.
  */
 class Database {
 public:
-    Database() = default;
-    ~Database();
+    Database();
 
     Database(const Database&) = delete;
     Database& operator=(const Database&) = delete;
@@ -47,7 +50,10 @@ public:
     sqlite3* connection();
 
 private:
-    bool executeSql(const std::string& sql);
+    using SqliteHandle = std::unique_ptr<sqlite3, void (*)(sqlite3*)>;
 
-    sqlite3* db_ = nullptr;
+    bool executeSql(const std::string& sql);
+    static SqliteHandle makeHandle(sqlite3* raw = nullptr);
+
+    SqliteHandle db_;
 };

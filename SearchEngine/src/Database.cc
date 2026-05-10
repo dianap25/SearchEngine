@@ -1,8 +1,8 @@
 // Authors: Alesia Filinkova, Diana Pelin
 // Description: Implementation of the Database wrapper around SQLite.
-// Responsible for connecting, creating tables and indexes used by the
-// index/refresh pipeline, and migrating older databases that predate
-// the content_hash column.
+// Owns the connection through a unique_ptr with a custom deleter so
+// sqlite3_close runs automatically on destruction; also handles
+// schema creation and the content_hash migration.
 
 #include "Database.h"
 
@@ -11,34 +11,43 @@
 #include <iostream>
 #include <string>
 
-Database::~Database() {
-    if (db_ != nullptr) {
-        sqlite3_close(db_);
-        db_ = nullptr;
+namespace {
+
+void closeSqlite(sqlite3* handle) {
+    if (handle != nullptr) {
+        sqlite3_close(handle);
     }
 }
 
-bool Database::open(const std::string& path) {
-    if (db_ != nullptr) {
-        sqlite3_close(db_);
-        db_ = nullptr;
-    }
+} // namespace
 
-    int rc = sqlite3_open(path.c_str(), &db_);
+Database::SqliteHandle Database::makeHandle(sqlite3* raw) {
+    return SqliteHandle(raw, &closeSqlite);
+}
+
+Database::Database()
+    : db_(makeHandle()) {
+}
+
+bool Database::open(const std::string& path) {
+    db_.reset();
+
+    sqlite3* raw = nullptr;
+    int rc = sqlite3_open(path.c_str(), &raw);
 
     if (rc != SQLITE_OK) {
         std::cerr << "Failed to open database: "
-                  << (db_ != nullptr ? sqlite3_errmsg(db_) : "unknown error")
+                  << (raw != nullptr ? sqlite3_errmsg(raw) : "unknown error")
                   << "\n";
 
-        if (db_ != nullptr) {
-            sqlite3_close(db_);
-            db_ = nullptr;
+        if (raw != nullptr) {
+            sqlite3_close(raw);
         }
 
         return false;
     }
 
+    db_ = makeHandle(raw);
     return true;
 }
 
@@ -104,7 +113,7 @@ bool Database::initializeSchema() {
     // that case is intentionally ignored.
     char* alter_error = nullptr;
     int alter_rc = sqlite3_exec(
-        db_,
+        db_.get(),
         "ALTER TABLE files ADD COLUMN content_hash TEXT NOT NULL DEFAULT '';",
         nullptr,
         nullptr,
@@ -128,7 +137,7 @@ bool Database::executeSql(const std::string& sql) {
     char* error_message = nullptr;
 
     int rc = sqlite3_exec(
-        db_,
+        db_.get(),
         sql.c_str(),
         nullptr,
         nullptr,
@@ -148,5 +157,5 @@ bool Database::executeSql(const std::string& sql) {
 }
 
 sqlite3* Database::connection() {
-    return db_;
+    return db_.get();
 }
