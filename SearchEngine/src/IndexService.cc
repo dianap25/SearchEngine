@@ -40,13 +40,13 @@ IndexSummary IndexService::indexDirectory(const std::string& root_path) {
         std::string content = result.content;
 
         if (content.empty()) {
-            std::cerr << "Skipped empty or unreadable file: " << file.path << "\n";
+            std::cerr << "Pominieto pusty lub nieczytelny plik: " << file.path << "\n";
             ++summary.skipped_files;
             continue;
         }
 
         if (!repository.beginTransaction()) {
-            std::cerr << "Failed to start transaction for file: " << file.path << "\n";
+            std::cerr << "Nie udalo sie rozpoczac transakcji dla pliku: " << file.path << "\n";
             ++summary.failed_files;
             continue;
         }
@@ -57,28 +57,28 @@ IndexSummary IndexService::indexDirectory(const std::string& root_path) {
         int file_id = repository.saveFileMetadata(file_with_hash);
 
         if (file_id < 0) {
-            std::cerr << "Failed to save file metadata: " << file.path << "\n";
+            std::cerr << "Nie udalo sie zapisac metadanych pliku: " << file.path << "\n";
             repository.rollbackTransaction();
             ++summary.failed_files;
             continue;
         }
 
         if (!repository.saveFileText(file_id, content)) {
-            std::cerr << "Failed to save file text: " << file.path << "\n";
+            std::cerr << "Nie udalo sie zapisac tresci pliku: " << file.path << "\n";
             repository.rollbackTransaction();
             ++summary.failed_files;
             continue;
         }
 
         if (!indexer.indexFile(file_id, content)) {
-            std::cerr << "Failed to index file: " << file.path << "\n";
+            std::cerr << "Nie udalo sie zaindeksowac pliku: " << file.path << "\n";
             repository.rollbackTransaction();
             ++summary.failed_files;
             continue;
         }
 
         if (!repository.commitTransaction()) {
-            std::cerr << "Failed to commit transaction for file: " << file.path << "\n";
+            std::cerr << "Nie udalo sie zatwierdzic transakcji dla pliku: " << file.path << "\n";
             repository.rollbackTransaction();
             ++summary.failed_files;
             continue;

@@ -37,8 +37,8 @@ bool Database::open(const std::string& path) {
     int rc = sqlite3_open(path.c_str(), &raw);
 
     if (rc != SQLITE_OK) {
-        std::cerr << "Failed to open database: "
-                  << (raw != nullptr ? sqlite3_errmsg(raw) : "unknown error")
+        std::cerr << "Nie udalo sie otworzyc bazy danych: "
+                  << (raw != nullptr ? sqlite3_errmsg(raw) : "nieznany blad")
                   << "\n";
 
         if (raw != nullptr) {
@@ -54,7 +54,7 @@ bool Database::open(const std::string& path) {
 
 bool Database::initializeSchema() {
     if (db_ == nullptr) {
-        std::cerr << "Database is not open\n";
+        std::cerr << "Baza danych nie jest otwarta\n";
         return false;
     }
 
@@ -126,7 +126,7 @@ bool Database::initializeSchema() {
         sqlite3_free(alter_error);
 
         if (message.find("duplicate column") == std::string::npos) {
-            std::cerr << "Schema migration failed: " << message << "\n";
+            std::cerr << "Migracja schematu nie powiodla sie: " << message << "\n";
             return false;
         }
     }
@@ -146,8 +146,8 @@ bool Database::executeSql(const std::string& sql) {
     );
 
     if (rc != SQLITE_OK) {
-        std::cerr << "SQL error: "
-                  << (error_message != nullptr ? error_message : "unknown error")
+        std::cerr << "Blad SQL: "
+                  << (error_message != nullptr ? error_message : "nieznany blad")
                   << "\n";
 
         sqlite3_free(error_message);

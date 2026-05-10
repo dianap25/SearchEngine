@@ -15,12 +15,12 @@ std::vector<FileMetadata> Scanner::scan(const std::string& root_path) {
     std::filesystem::path root(root_path);
 
     if (!std::filesystem::exists(root)) {
-        std::cerr << "Scan path does not exist: " << root_path << "\n";
+        std::cerr << "Sciezka skanowania nie istnieje: " << root_path << "\n";
         return files;
     }
 
     if (!std::filesystem::is_directory(root)) {
-        std::cerr << "Scan path is not a directory: " << root_path << "\n";
+        std::cerr << "Sciezka skanowania nie jest katalogiem: " << root_path << "\n";
         return files;
     }
 
@@ -41,7 +41,7 @@ std::vector<FileMetadata> Scanner::scan(const std::string& root_path) {
 
             files.push_back(buildMetadata(entry));
         } catch (const std::filesystem::filesystem_error& error) {
-            std::cerr << "Failed to read file metadata: "
+            std::cerr << "Nie udalo sie odczytac metadanych pliku: "
                       << entry.path().string()
                       << " | "
                       << error.what()

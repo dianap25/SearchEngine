@@ -40,11 +40,11 @@ ExtractResult readChildStdout(int fd) {
             continue;
         }
         return ExtractResult::fail(
-            std::string("read from pdftotext failed: ") + std::strerror(errno));
+            std::string("Odczyt z pdftotext nie powiodl sie: ") + std::strerror(errno));
     }
 
     if (content.empty()) {
-        return ExtractResult::fail("PDF extraction returned empty content");
+        return ExtractResult::fail("Ekstrakcja PDF zwrocila pusta tresc");
     }
 
     return ExtractResult::ok(std::move(content));
@@ -54,13 +54,13 @@ ExtractResult readChildStdout(int fd) {
 
 ExtractResult PdfExtractor::extract(const std::string& file_path) const {
     if (!fs::exists(file_path)) {
-        return ExtractResult::fail("File does not exist");
+        return ExtractResult::fail("Plik nie istnieje");
     }
 
     int pipe_fds[2];
     if (::pipe(pipe_fds) != 0) {
         return ExtractResult::fail(
-            std::string("pipe() failed: ") + std::strerror(errno));
+            std::string("pipe() nie powiodl sie: ") + std::strerror(errno));
     }
 
     pid_t pid = ::fork();
@@ -68,7 +68,7 @@ ExtractResult PdfExtractor::extract(const std::string& file_path) const {
         ::close(pipe_fds[READ_END]);
         ::close(pipe_fds[WRITE_END]);
         return ExtractResult::fail(
-            std::string("fork() failed: ") + std::strerror(errno));
+            std::string("fork() nie powiodl sie: ") + std::strerror(errno));
     }
 
     if (pid == 0) {
@@ -101,7 +101,7 @@ ExtractResult PdfExtractor::extract(const std::string& file_path) const {
     while (::waitpid(pid, &status, 0) < 0) {
         if (errno != EINTR) {
             return ExtractResult::fail(
-                std::string("waitpid() failed: ") + std::strerror(errno));
+                std::string("waitpid() nie powiodl sie: ") + std::strerror(errno));
         }
     }
 
@@ -109,11 +109,11 @@ ExtractResult PdfExtractor::extract(const std::string& file_path) const {
         int code = WEXITSTATUS(status);
         if (code != 0) {
             return ExtractResult::fail(
-                "pdftotext exited with status " + std::to_string(code));
+                "pdftotext zakonczony statusem " + std::to_string(code));
         }
     } else if (WIFSIGNALED(status)) {
         return ExtractResult::fail(
-            "pdftotext killed by signal " + std::to_string(WTERMSIG(status)));
+            "pdftotext zabity sygnalem " + std::to_string(WTERMSIG(status)));
     }
 
     return result;

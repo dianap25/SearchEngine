@@ -13,13 +13,13 @@ namespace fs = std::filesystem;
 
 ExtractResult TextExtractor::extract(const std::string& file_path) const {
     if (!fs::exists(file_path)) {
-        return ExtractResult::fail("File does not exist");
+        return ExtractResult::fail("Plik nie istnieje");
     }
 
     std::ifstream file(file_path);
 
     if (!file.is_open()) {
-        return ExtractResult::fail("Cannot open text file");
+        return ExtractResult::fail("Nie mozna otworzyc pliku tekstowego");
     }
 
     std::stringstream buffer;
@@ -28,7 +28,7 @@ ExtractResult TextExtractor::extract(const std::string& file_path) const {
     std::string content = buffer.str();
 
     if (content.empty()) {
-        return ExtractResult::fail("Empty text file");
+        return ExtractResult::fail("Pusty plik tekstowy");
     }
 
     return ExtractResult::ok(content);
