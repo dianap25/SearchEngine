@@ -1,0 +1,43 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\title{Algorytmy grafowe -- przeglad}
+\author{Alesia Filinkova \and Diana Pelin}
+\date{Maj 2026}
+
+\begin{document}
+\maketitle
+
+\section{Wprowadzenie}
+
+Graf to para uporzadkowana $G = (V, E)$, gdzie $V$ jest skonczonym
+zbiorem wierzcholkow, a $E \subseteq V \times V$ zbiorem krawedzi.
+Algorytmy grafowe stanowia jedna z podstawowych galezi informatyki
+i znajduja zastosowanie wszedzie, gdzie modelujemy relacje miedzy
+obiektami: w sieciach komputerowych, planowaniu trasy, kompilatorach
+oraz w analizie sieci spolecznych.
+
+\section{Przeszukiwanie wszerz}
+
+Algorytm BFS odwiedza wierzcholki w kolejnosci ich odleglosci od
+wierzcholka startowego. Wykorzystuje strukture kolejki FIFO i ma
+zlozonosc $O(V + E)$. Dla grafu nieskierowanego BFS pozwala wyznaczyc
+najkrotsze sciezki w sensie liczby krawedzi.
+
+\section{Algorytm Dijkstry}
+
+Dijkstra znajduje najkrotsze sciezki ze zrodla do wszystkich
+pozostalych wierzcholkow w grafie z nieujemnymi wagami krawedzi.
+Implementacja oparta o kopiec binarny ma zlozonosc $O((V + E) \log V)$.
+Algorytm zaklada, ze waga $w(u, v) \geq 0$ dla kazdej krawedzi.
+
+\section{Drzewo rozpinajace}
+
+Algorytmy Prima i Kruskala wyznaczaja minimalne drzewo rozpinajace
+w grafie spojnym. Kruskal wykorzystuje strukture zbiorow rozlacznych,
+a Prim -- kopiec priorytetowy. Oba osiagaja zlozonosc $O(E \log V)$.
+
+\end{document}

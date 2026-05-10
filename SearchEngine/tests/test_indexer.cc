@@ -1,5 +1,5 @@
-//Alesia Filinkova
-//Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+
 
 #include <gtest/gtest.h>
 
@@ -34,6 +34,35 @@ TEST(IndexerTest, TokenizesAndNormalizesContent) {
     EXPECT_EQ(tokens[2].second, 2);
 }
 
+TEST(IndexerTest, IndexesAllPostingsForRepeatedWord) {
+    Database database;
+    ASSERT_TRUE(database.open(":memory:"));
+    ASSERT_TRUE(database.initializeSchema());
+
+    Repository repository(database.connection());
+    Indexer indexer(repository);
+
+    FileMetadata metadata;
+    metadata.path = "many.txt";
+    metadata.name = "many.txt";
+    metadata.extension = ".txt";
+
+    int file_id = repository.saveFileMetadata(metadata);
+    ASSERT_GT(file_id, 0);
+
+    std::string content;
+    for (int i = 0; i < 1000; ++i) {
+        content += "echo ";
+    }
+
+    ASSERT_TRUE(indexer.indexFile(file_id, content));
+
+    std::vector<SearchResult> results = repository.searchByContent("echo");
+
+    ASSERT_EQ(results.size(), 1);
+    EXPECT_EQ(results[0].occurrences, 1000);
+}
+
 TEST(IndexerTest, SavesTokensToDatabase) {
     Database database;
     ASSERT_TRUE(database.open(":memory:"));
@@ -47,13 +76,13 @@ TEST(IndexerTest, SavesTokensToDatabase) {
     metadata.name = "sample.txt";
     metadata.extension = ".txt";
     metadata.size = 20;
-    metadata.modifiedTime = 100;
+    metadata.modified_time = 100;
 
-    int fileId = repository.saveFileMetadata(metadata);
-    ASSERT_GT(fileId, 0);
+    int file_id = repository.saveFileMetadata(metadata);
+    ASSERT_GT(file_id, 0);
 
-    ASSERT_TRUE(repository.saveFileText(fileId, "hello world hello"));
-    ASSERT_TRUE(indexer.indexFile(fileId, "hello world hello"));
+    ASSERT_TRUE(repository.saveFileText(file_id, "hello world hello"));
+    ASSERT_TRUE(indexer.indexFile(file_id, "hello world hello"));
 
     std::vector<SearchResult> results = repository.searchByContent("hello");
 

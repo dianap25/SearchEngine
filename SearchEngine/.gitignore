@@ -1,3 +1,14 @@
 build/
 .vscode/
 Testing/
+
+# Build artefacts
+*.o
+*.a
+
+# Generated index databases
+*.db
+index.db
+
+# Generated Doxygen documentation
+docs/

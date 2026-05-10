@@ -1,5 +1,9 @@
-//Alesia Filinkova
-//Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of the Repository persistence layer
+// over the SQLite index schema (files, file_texts, terms, postings).
+// Provides metadata and posting writes plus name-based and
+// content-based search queries.
+
 
 #include "Repository.h"
 
@@ -7,6 +11,7 @@
 
 #include <ctime>
 #include <iostream>
+#include <unordered_map>
 
 Repository::Repository(sqlite3* db)
     : db_(db) {
@@ -25,16 +30,16 @@ bool Repository::rollbackTransaction() {
 }
 
 bool Repository::executeSql(const std::string& sql) {
-    char* errorMessage = nullptr;
+    char* error_message = nullptr;
 
-    int rc = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &errorMessage);
+    int rc = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &error_message);
 
     if (rc != SQLITE_OK) {
         std::cerr << "SQL error: "
-                  << (errorMessage != nullptr ? errorMessage : "unknown error")
+                  << (error_message != nullptr ? error_message : "unknown error")
                   << "\n";
 
-        sqlite3_free(errorMessage);
+        sqlite3_free(error_message);
         return false;
     }
 
@@ -43,14 +48,15 @@ bool Repository::executeSql(const std::string& sql) {
 
 int Repository::saveFileMetadata(const FileMetadata& metadata) {
     const char* sql = R"(
-        INSERT INTO files(path, name, extension, size, modified_time, indexed_at)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO files(path, name, extension, size, modified_time, indexed_at, content_hash)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(path) DO UPDATE SET
             name = excluded.name,
             extension = excluded.extension,
             size = excluded.size,
             modified_time = excluded.modified_time,
-            indexed_at = excluded.indexed_at
+            indexed_at = excluded.indexed_at,
+            content_hash = excluded.content_hash
         RETURNING id;
     )";
 
@@ -67,13 +73,14 @@ int Repository::saveFileMetadata(const FileMetadata& metadata) {
     sqlite3_bind_text(statement, 2, metadata.name.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(statement, 3, metadata.extension.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_int64(statement, 4, static_cast<sqlite3_int64>(metadata.size));
-    sqlite3_bind_int64(statement, 5, static_cast<sqlite3_int64>(metadata.modifiedTime));
+    sqlite3_bind_int64(statement, 5, static_cast<sqlite3_int64>(metadata.modified_time));
     sqlite3_bind_int64(statement, 6, static_cast<sqlite3_int64>(now));
+    sqlite3_bind_text(statement, 7, metadata.content_hash.c_str(), -1, SQLITE_TRANSIENT);
 
-    int fileId = -1;
+    int file_id = -1;
 
     if (sqlite3_step(statement) == SQLITE_ROW) {
-        fileId = sqlite3_column_int(statement, 0);
+        file_id = sqlite3_column_int(statement, 0);
     } else {
         std::cerr << "Failed to save file metadata: "
                   << sqlite3_errmsg(db_)
@@ -81,10 +88,10 @@ int Repository::saveFileMetadata(const FileMetadata& metadata) {
     }
 
     sqlite3_finalize(statement);
-    return fileId;
+    return file_id;
 }
 
-bool Repository::saveFileText(int fileId, const std::string& content) {
+bool Repository::saveFileText(int file_id, const std::string& content) {
     const char* sql = R"(
         INSERT INTO file_texts(file_id, content)
         VALUES (?, ?)
@@ -99,7 +106,7 @@ bool Repository::saveFileText(int fileId, const std::string& content) {
         return false;
     }
 
-    sqlite3_bind_int(statement, 1, fileId);
+    sqlite3_bind_int(statement, 1, file_id);
     sqlite3_bind_text(statement, 2, content.c_str(), -1, SQLITE_TRANSIENT);
 
     bool success = sqlite3_step(statement) == SQLITE_DONE;
@@ -114,80 +121,115 @@ bool Repository::saveFileText(int fileId, const std::string& content) {
     return success;
 }
 
-int Repository::findOrCreateTerm(const std::string& term) {
-    const char* insertSql = R"(
-        INSERT INTO terms(term)
-        VALUES (?)
-        ON CONFLICT(term) DO NOTHING;
-    )";
-
-    sqlite3_stmt* insertStatement = nullptr;
-
-    if (sqlite3_prepare_v2(db_, insertSql, -1, &insertStatement, nullptr) != SQLITE_OK) {
-        return -1;
+bool Repository::saveTermPositionsBatch(
+    int file_id,
+    const std::vector<std::pair<std::string, int>>& tokens
+) {
+    if (tokens.empty()) {
+        return true;
     }
 
-    sqlite3_bind_text(insertStatement, 1, term.c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_step(insertStatement);
-    sqlite3_finalize(insertStatement);
+    sqlite3_stmt* insert_term_stmt = nullptr;
+    sqlite3_stmt* select_term_stmt = nullptr;
+    sqlite3_stmt* insert_posting_stmt = nullptr;
 
-    const char* selectSql = "SELECT id FROM terms WHERE term = ?;";
+    auto cleanup = [&]() {
+        sqlite3_finalize(insert_term_stmt);
+        sqlite3_finalize(select_term_stmt);
+        sqlite3_finalize(insert_posting_stmt);
+    };
 
-    sqlite3_stmt* selectStatement = nullptr;
-
-    if (sqlite3_prepare_v2(db_, selectSql, -1, &selectStatement, nullptr) != SQLITE_OK) {
-        return -1;
-    }
-
-    sqlite3_bind_text(selectStatement, 1, term.c_str(), -1, SQLITE_TRANSIENT);
-
-    int termId = -1;
-
-    if (sqlite3_step(selectStatement) == SQLITE_ROW) {
-        termId = sqlite3_column_int(selectStatement, 0);
-    }
-
-    sqlite3_finalize(selectStatement);
-    return termId;
-}
-
-bool Repository::saveTermPosition(int fileId, const std::string& term, int position) {
-    int termId = findOrCreateTerm(term);
-
-    if (termId < 0) {
+    if (sqlite3_prepare_v2(
+            db_,
+            "INSERT INTO terms(term) VALUES (?) ON CONFLICT(term) DO NOTHING;",
+            -1,
+            &insert_term_stmt,
+            nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to prepare insert-term statement: "
+                  << sqlite3_errmsg(db_) << "\n";
+        cleanup();
         return false;
     }
 
-    const char* sql = R"(
-        INSERT INTO postings(term_id, file_id, position)
-        VALUES (?, ?, ?);
-    )";
-
-    sqlite3_stmt* statement = nullptr;
-
-    if (sqlite3_prepare_v2(db_, sql, -1, &statement, nullptr) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(
+            db_,
+            "SELECT id FROM terms WHERE term = ?;",
+            -1,
+            &select_term_stmt,
+            nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to prepare select-term statement: "
+                  << sqlite3_errmsg(db_) << "\n";
+        cleanup();
         return false;
     }
 
-    sqlite3_bind_int(statement, 1, termId);
-    sqlite3_bind_int(statement, 2, fileId);
-    sqlite3_bind_int(statement, 3, position);
-
-    bool success = sqlite3_step(statement) == SQLITE_DONE;
-
-    if (!success) {
-        std::cerr << "Failed to save term position: "
-                  << sqlite3_errmsg(db_)
-                  << "\n";
+    if (sqlite3_prepare_v2(
+            db_,
+            "INSERT INTO postings(term_id, file_id, position) VALUES (?, ?, ?);",
+            -1,
+            &insert_posting_stmt,
+            nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to prepare insert-posting statement: "
+                  << sqlite3_errmsg(db_) << "\n";
+        cleanup();
+        return false;
     }
 
-    sqlite3_finalize(statement);
-    return success;
+    std::unordered_map<std::string, int> term_cache;
+    term_cache.reserve(tokens.size() / 2 + 1);
+
+    for (const auto& [term, position] : tokens) {
+        int term_id = -1;
+        auto cached = term_cache.find(term);
+        if (cached != term_cache.end()) {
+            term_id = cached->second;
+        } else {
+            sqlite3_reset(insert_term_stmt);
+            sqlite3_clear_bindings(insert_term_stmt);
+            sqlite3_bind_text(insert_term_stmt, 1, term.c_str(), -1, SQLITE_TRANSIENT);
+            int rc = sqlite3_step(insert_term_stmt);
+            if (rc != SQLITE_DONE) {
+                std::cerr << "Failed to insert term '" << term << "': "
+                          << sqlite3_errmsg(db_) << "\n";
+                cleanup();
+                return false;
+            }
+
+            sqlite3_reset(select_term_stmt);
+            sqlite3_clear_bindings(select_term_stmt);
+            sqlite3_bind_text(select_term_stmt, 1, term.c_str(), -1, SQLITE_TRANSIENT);
+            if (sqlite3_step(select_term_stmt) != SQLITE_ROW) {
+                std::cerr << "Failed to look up id of term '" << term << "': "
+                          << sqlite3_errmsg(db_) << "\n";
+                cleanup();
+                return false;
+            }
+            term_id = sqlite3_column_int(select_term_stmt, 0);
+            term_cache.emplace(term, term_id);
+        }
+
+        sqlite3_reset(insert_posting_stmt);
+        sqlite3_clear_bindings(insert_posting_stmt);
+        sqlite3_bind_int(insert_posting_stmt, 1, term_id);
+        sqlite3_bind_int(insert_posting_stmt, 2, file_id);
+        sqlite3_bind_int(insert_posting_stmt, 3, position);
+
+        if (sqlite3_step(insert_posting_stmt) != SQLITE_DONE) {
+            std::cerr << "Failed to insert posting (term='" << term
+                      << "', pos=" << position << "): "
+                      << sqlite3_errmsg(db_) << "\n";
+            cleanup();
+            return false;
+        }
+    }
+
+    cleanup();
+    return true;
 }
 
 std::optional<FileMetadata> Repository::findByPath(const std::string& path) {
     const char* sql = R"(
-        SELECT path, name, extension, size, modified_time
+        SELECT id, path, name, extension, size, modified_time, content_hash
         FROM files
         WHERE path = ?;
     )";
@@ -204,11 +246,16 @@ std::optional<FileMetadata> Repository::findByPath(const std::string& path) {
 
     if (sqlite3_step(statement) == SQLITE_ROW) {
         FileMetadata metadata;
-        metadata.path = reinterpret_cast<const char*>(sqlite3_column_text(statement, 0));
-        metadata.name = reinterpret_cast<const char*>(sqlite3_column_text(statement, 1));
-        metadata.extension = reinterpret_cast<const char*>(sqlite3_column_text(statement, 2));
-        metadata.size = static_cast<std::uintmax_t>(sqlite3_column_int64(statement, 3));
-        metadata.modifiedTime = static_cast<std::int64_t>(sqlite3_column_int64(statement, 4));
+        metadata.id = sqlite3_column_int(statement, 0);
+        metadata.path = reinterpret_cast<const char*>(sqlite3_column_text(statement, 1));
+        metadata.name = reinterpret_cast<const char*>(sqlite3_column_text(statement, 2));
+        metadata.extension = reinterpret_cast<const char*>(sqlite3_column_text(statement, 3));
+        metadata.size = static_cast<std::uintmax_t>(sqlite3_column_int64(statement, 4));
+        metadata.modified_time = static_cast<std::int64_t>(sqlite3_column_int64(statement, 5));
+        const unsigned char* hash_text = sqlite3_column_text(statement, 6);
+        if (hash_text != nullptr) {
+            metadata.content_hash = reinterpret_cast<const char*>(hash_text);
+        }
 
         result = metadata;
     }
@@ -252,7 +299,7 @@ std::optional<std::string> Repository::findTextByPath(const std::string& path) {
 
 std::vector<FileMetadata> Repository::findAllFiles() {
     const char* sql = R"(
-        SELECT path, name, extension, size, modified_time
+        SELECT id, path, name, extension, size, modified_time, content_hash
         FROM files;
     )";
 
@@ -265,11 +312,16 @@ std::vector<FileMetadata> Repository::findAllFiles() {
 
     while (sqlite3_step(statement) == SQLITE_ROW) {
         FileMetadata metadata;
-        metadata.path = reinterpret_cast<const char*>(sqlite3_column_text(statement, 0));
-        metadata.name = reinterpret_cast<const char*>(sqlite3_column_text(statement, 1));
-        metadata.extension = reinterpret_cast<const char*>(sqlite3_column_text(statement, 2));
-        metadata.size = static_cast<std::uintmax_t>(sqlite3_column_int64(statement, 3));
-        metadata.modifiedTime = static_cast<std::int64_t>(sqlite3_column_int64(statement, 4));
+        metadata.id = sqlite3_column_int(statement, 0);
+        metadata.path = reinterpret_cast<const char*>(sqlite3_column_text(statement, 1));
+        metadata.name = reinterpret_cast<const char*>(sqlite3_column_text(statement, 2));
+        metadata.extension = reinterpret_cast<const char*>(sqlite3_column_text(statement, 3));
+        metadata.size = static_cast<std::uintmax_t>(sqlite3_column_int64(statement, 4));
+        metadata.modified_time = static_cast<std::int64_t>(sqlite3_column_int64(statement, 5));
+        const unsigned char* hash_text = sqlite3_column_text(statement, 6);
+        if (hash_text != nullptr) {
+            metadata.content_hash = reinterpret_cast<const char*>(hash_text);
+        }
 
         files.push_back(metadata);
     }
@@ -295,7 +347,7 @@ bool Repository::deleteFileByPath(const std::string& path) {
     return success;
 }
 
-bool Repository::deleteIndexForFile(int fileId) {
+bool Repository::deleteIndexForFile(int file_id) {
     const char* sql = "DELETE FROM postings WHERE file_id = ?;";
 
     sqlite3_stmt* statement = nullptr;
@@ -304,7 +356,7 @@ bool Repository::deleteIndexForFile(int fileId) {
         return false;
     }
 
-    sqlite3_bind_int(statement, 1, fileId);
+    sqlite3_bind_int(statement, 1, file_id);
 
     bool success = sqlite3_step(statement) == SQLITE_DONE;
 

@@ -1,0 +1,7 @@
+Wprowadzenie do programowania w jezyku C++
+
+C++ jest jezykiem programowania ogolnego przeznaczenia, ktory laczy paradygmaty proceduralny, obiektowy i generyczny. Powstal w latach osiemdziesiatych jako rozszerzenie jezyka C i do dzisiaj jest jednym z najczesciej uzywanych jezykow w programowaniu systemowym, grach komputerowych oraz aplikacjach o wysokiej wydajnosci.
+
+Podstawowym budulcem programu w C++ jest funkcja. Kazdy program musi zawierac funkcje main, ktora stanowi punkt wejscia. Zmienne deklarujemy podajac najpierw typ, na przyklad int, double albo std::string. Pamiec mozna zarzadzac recznie z pomoca operatorow new i delete, jednak nowoczesne podejscie zaleca uzywanie inteligentnych wskaznikow takich jak std::unique_ptr i std::shared_ptr.
+
+Biblioteka standardowa udostepnia kontenery, algorytmy i strumienie wejscia wyjscia. Bardzo czesto siegamy po std::vector do przechowywania kolekcji elementow, std::map dla par klucz wartosc oraz std::sort dla sortowania. Dobry kod w C++ powinien byc czytelny, bezpieczny pamieciowo i wydajny.

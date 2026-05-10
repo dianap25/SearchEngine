@@ -1,5 +1,9 @@
-//Alesia Filinkova
-//Diana Pelin
+// Authors: Alesia Filinkova, Diana Pelin
+// Description: Implementation of the Database RAII wrapper. Opens a
+// SQLite connection through std::unique_ptr with a custom deleter,
+// creates the index schema and runs the lightweight content_hash
+// migration.
+
 
 #include "Database.h"
 
@@ -8,34 +12,43 @@
 #include <iostream>
 #include <string>
 
-Database::~Database() {
-    if (db_ != nullptr) {
-        sqlite3_close(db_);
-        db_ = nullptr;
+namespace {
+
+void closeSqlite(sqlite3* handle) {
+    if (handle != nullptr) {
+        sqlite3_close(handle);
     }
 }
 
-bool Database::open(const std::string& path) {
-    if (db_ != nullptr) {
-        sqlite3_close(db_);
-        db_ = nullptr;
-    }
+} // namespace
 
-    int rc = sqlite3_open(path.c_str(), &db_);
+Database::SqliteHandle Database::makeHandle(sqlite3* raw) {
+    return SqliteHandle(raw, &closeSqlite);
+}
+
+Database::Database()
+    : db_(makeHandle()) {
+}
+
+bool Database::open(const std::string& path) {
+    db_.reset();
+
+    sqlite3* raw = nullptr;
+    int rc = sqlite3_open(path.c_str(), &raw);
 
     if (rc != SQLITE_OK) {
         std::cerr << "Failed to open database: "
-                  << (db_ != nullptr ? sqlite3_errmsg(db_) : "unknown error")
+                  << (raw != nullptr ? sqlite3_errmsg(raw) : "unknown error")
                   << "\n";
 
-        if (db_ != nullptr) {
-            sqlite3_close(db_);
-            db_ = nullptr;
+        if (raw != nullptr) {
+            sqlite3_close(raw);
         }
 
         return false;
     }
 
+    db_ = makeHandle(raw);
     return true;
 }
 
@@ -55,7 +68,8 @@ bool Database::initializeSchema() {
             extension TEXT,
             size INTEGER NOT NULL,
             modified_time INTEGER NOT NULL,
-            indexed_at INTEGER NOT NULL
+            indexed_at INTEGER NOT NULL,
+            content_hash TEXT NOT NULL DEFAULT ''
         );
 
         CREATE TABLE IF NOT EXISTS terms (
@@ -90,26 +104,53 @@ bool Database::initializeSchema() {
             ON postings(term_id, file_id);
     )";
 
-    return executeSql(sql);
+    if (!executeSql(sql)) {
+        return false;
+    }
+
+    // Lightweight migration for older databases that were created
+    // before the content_hash column existed. When the column is
+    // already there, SQLite returns SQLITE_ERROR with a "duplicate
+    // column name" message; that case is intentionally ignored.
+    char* alter_error = nullptr;
+    int alter_rc = sqlite3_exec(
+        db_.get(),
+        "ALTER TABLE files ADD COLUMN content_hash TEXT NOT NULL DEFAULT '';",
+        nullptr,
+        nullptr,
+        &alter_error
+    );
+
+    if (alter_rc != SQLITE_OK) {
+        const std::string message = alter_error != nullptr ? alter_error : "";
+        sqlite3_free(alter_error);
+
+        if (message.find("duplicate column") == std::string::npos) {
+            std::cerr << "Schema migration failed: " << message << "\n";
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool Database::executeSql(const std::string& sql) {
-    char* errorMessage = nullptr;
+    char* error_message = nullptr;
 
     int rc = sqlite3_exec(
-        db_,
+        db_.get(),
         sql.c_str(),
         nullptr,
         nullptr,
-        &errorMessage
+        &error_message
     );
 
     if (rc != SQLITE_OK) {
         std::cerr << "SQL error: "
-                  << (errorMessage != nullptr ? errorMessage : "unknown error")
+                  << (error_message != nullptr ? error_message : "unknown error")
                   << "\n";
 
-        sqlite3_free(errorMessage);
+        sqlite3_free(error_message);
         return false;
     }
 
@@ -117,5 +158,5 @@ bool Database::executeSql(const std::string& sql) {
 }
 
 sqlite3* Database::connection() {
-    return db_;
+    return db_.get();
 }
