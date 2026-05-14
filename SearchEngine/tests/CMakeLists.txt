@@ -1,4 +1,5 @@
 find_package(GTest REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 add_executable(unit_tests
     test_database.cc
