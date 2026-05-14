@@ -2,105 +2,353 @@
 
 
 #include <gtest/gtest.h>
-
-#include "ExtractResult.h"
-#include "ExtractorFactory.h"
-#include "PdfExtractor.h"
+#include "Extractor.h"
 #include "TextExtractor.h"
+#include "PdfExtractor.h"
+#include "ExtractorFactory.h"
 
-#include <cstdlib>
-#include <filesystem>
-#include <fstream>
-#include <memory>
 #include <string>
+#include <fstream>
+#include <filesystem>
 
 #ifndef TEST_SAMPLE_DATA_DIR
 #define TEST_SAMPLE_DATA_DIR "../sample_data"
 #endif
 
-namespace {
+namespace fs = std::filesystem;
 
-bool pdftotextAvailable() {
-    return std::system("command -v pdftotext > /dev/null 2>&1") == 0;
-}
+class TextExtractorTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        testDir_ = std::string(TEST_SAMPLE_DATA_DIR) + "/text_test";
+        fs::create_directories(testDir_);
+    }
 
-} // namespace
+    void TearDown() override {
+        fs::remove_all(testDir_);
+    }
 
-TEST(TextExtractorTest, ReadsExistingTxtFile) {
+    std::string createTestFile(const std::string& name, const std::string& content) {
+        std::string path = testDir_ + "/" + name;
+        std::ofstream file(path);
+        file << content;
+        file.close();
+        return path;
+    }
+
+    std::string testDir_;
+};
+
+TEST_F(TextExtractorTest, ExtractsTextFromExistingTxtFile) {
     TextExtractor extractor;
-    std::string path = std::string(TEST_SAMPLE_DATA_DIR) + "/example.txt";
+    std::string path = createTestFile("example.txt", "Hello, World!");
 
     ExtractResult result = extractor.extract(path);
 
     EXPECT_TRUE(result.success);
-    EXPECT_FALSE(result.content.empty());
+    EXPECT_EQ(result.content, "Hello, World!");
 }
 
-TEST(TextExtractorTest, FailsForMissingFile) {
+TEST_F(TextExtractorTest, ExtractsTextFromFileWithoutExtension) {
+    TextExtractor extractor;
+    std::string path = createTestFile("no_extension", "Content without extension");
+
+    ExtractResult result = extractor.extract(path);
+
+    EXPECT_TRUE(result.success);
+    EXPECT_EQ(result.content, "Content without extension");
+}
+
+TEST_F(TextExtractorTest, ExtractsTextFromTexFile) {
+    TextExtractor extractor;
+    std::string path = createTestFile("document.tex", "\\documentclass{article}\nHello");
+
+    ExtractResult result = extractor.extract(path);
+
+    EXPECT_TRUE(result.success);
+    EXPECT_EQ(result.content, "\\documentclass{article}\nHello");
+}
+
+TEST_F(TextExtractorTest, ReturnsErrorForMissingFile) {
     TextExtractor extractor;
 
     ExtractResult result = extractor.extract("missing_file.txt");
 
     EXPECT_FALSE(result.success);
-    EXPECT_TRUE(result.content.empty());
+    EXPECT_FALSE(result.error_message.empty());
+    EXPECT_EQ(result.error_message, "Plik nie istnieje");
 }
 
-TEST(TextExtractorTest, FailsForEmptyFile) {
-    const std::filesystem::path empty_path = "test_extractor_empty.txt";
-    {
-        std::ofstream file(empty_path);
-    }
-
+TEST_F(TextExtractorTest, ReturnsErrorForEmptyFile) {
     TextExtractor extractor;
-    ExtractResult result = extractor.extract(empty_path.string());
+    std::string path = createTestFile("empty.txt", "");
+
+    ExtractResult result = extractor.extract(path);
 
     EXPECT_FALSE(result.success);
-
-    std::filesystem::remove(empty_path);
+    EXPECT_EQ(result.error_message, "Pusty plik tekstowy");
 }
 
-TEST(PdfExtractorTest, FailsForMissingPdf) {
-    PdfExtractor extractor;
+TEST_F(TextExtractorTest, ReturnsErrorForDirectory) {
+    TextExtractor extractor;
 
-    ExtractResult result = extractor.extract("missing_file.pdf");
+    ExtractResult result = extractor.extract(testDir_);
 
     EXPECT_FALSE(result.success);
+    EXPECT_FALSE(result.error_message.empty());
 }
 
-TEST(PdfExtractorTest, ExtractsContentFromRealPdfWhenAvailable) {
-    if (!pdftotextAvailable()) {
-        GTEST_SKIP() << "pdftotext not on PATH";
-    }
+TEST_F(TextExtractorTest, ExtractsMultilineText) {
+    TextExtractor extractor;
+    std::string content = "Line 1\nLine 2\nLine 3";
+    std::string path = createTestFile("multiline.txt", content);
 
-    PdfExtractor extractor;
-    const std::filesystem::path pdf_path = std::string(TEST_SAMPLE_DATA_DIR) + "/example.pdf";
-
-    if (!std::filesystem::exists(pdf_path)) {
-        GTEST_SKIP() << "no sample pdf at " << pdf_path;
-    }
-
-    ExtractResult result = extractor.extract(pdf_path.string());
+    ExtractResult result = extractor.extract(path);
 
     EXPECT_TRUE(result.success);
+    EXPECT_EQ(result.content, content);
+}
+
+TEST_F(TextExtractorTest, ExtractsLargeText) {
+    TextExtractor extractor;
+    std::string largeContent(10000, 'A');
+    std::string path = createTestFile("large.txt", largeContent);
+
+    ExtractResult result = extractor.extract(path);
+
+    EXPECT_TRUE(result.success);
+    EXPECT_EQ(result.content.size(), 10000);
+    EXPECT_EQ(result.content, largeContent);
+}
+
+
+class PdfExtractorTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        testDir_ = std::string(TEST_SAMPLE_DATA_DIR) + "/pdf_test";
+        fs::create_directories(testDir_);
+        
+        pdftotextAvailable_ = (system("which pdftotext > /dev/null 2>&1") == 0);
+    }
+
+    void TearDown() override {
+        fs::remove_all(testDir_);
+    }
+
+    std::string createTestFile(const std::string& name, const std::string& content) {
+        std::string path = testDir_ + "/" + name;
+        std::ofstream file(path);
+        file << content;
+        file.close();
+        return path;
+    }
+
+    std::string createPdfPath(const std::string& name) {
+        return std::string(TEST_SAMPLE_DATA_DIR) + "/" + name;
+    }
+
+    std::string testDir_;
+    bool pdftotextAvailable_;
+};
+
+TEST_F(PdfExtractorTest, ExtractsTextFromExistingPdfFile) {
+    if (system("which pdftotext > /dev/null 2>&1") != 0) {
+        FAIL() << "pdftotext not installed. Run: sudo apt install poppler-utils";
+    }
+    
+    std::string temp_dir = "temp_pdf_test";
+    fs::create_directories(temp_dir);
+    std::string pdf_path = temp_dir + "/test.pdf";
+    
+    FILE* f = fopen(pdf_path.c_str(), "wb");
+    if (f) {
+        const char* simple_pdf = "%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n/Contents 4 0 R\n>>\nendobj\n4 0 obj\n<<\n/Length 23\n>>\nstream\nBT\n/F1 24 Tf\n100 700 Td\n(TEST) Tj\nET\nendstream\nendobj\nxref\n0 5\n0000000000 65535 f\n0000000010 00000 n\n0000000053 00000 n\n0000000102 00000 n\n0000000178 00000 n\ntrailer\n<<\n/Size 5\n/Root 1 0 R\n>>\nstartxref\n298\n%%EOF\n";
+        fwrite(simple_pdf, 1, strlen(simple_pdf), f);
+        fclose(f);
+    }
+    
+    PdfExtractor extractor;
+    ExtractResult result = extractor.extract(pdf_path);
+    
+    EXPECT_TRUE(result.success);
     EXPECT_FALSE(result.content.empty());
+    
+    fs::remove_all(temp_dir);
 }
 
-TEST(ExtractorFactoryTest, ReturnsTextExtractorForTxt) {
-    auto extractor = ExtractorFactory::create("foo.txt");
+TEST_F(PdfExtractorTest, ReturnsErrorForMissingPdfFile) {
+    PdfExtractor extractor;
+
+    ExtractResult result = extractor.extract("missing.pdf");
+
+    EXPECT_FALSE(result.success);
+    EXPECT_EQ(result.error_message, "Plik nie istnieje");
+}
+
+TEST_F(PdfExtractorTest, ReturnsErrorForNonPdfFile) {
+    if (!pdftotextAvailable_) {
+        GTEST_SKIP() << "pdftotext not installed";
+    }
+    
+    PdfExtractor extractor;
+    std::string path = createTestFile("not_pdf.txt", "This is not a PDF");
+
+    ExtractResult result = extractor.extract(path);
+
+    EXPECT_FALSE(result.success);
+    EXPECT_FALSE(result.error_message.empty());
+}
+
+class ExtractorFactoryTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        testDir_ = std::string(TEST_SAMPLE_DATA_DIR) + "/factory_test";
+        fs::create_directories(testDir_);
+    }
+
+    void TearDown() override {
+        fs::remove_all(testDir_);
+    }
+
+    std::string createTestFile(const std::string& name) {
+        std::string path = testDir_ + "/" + name;
+        std::ofstream file(path);
+        file << "test content";
+        file.close();
+        return path;
+    }
+
+    std::string testDir_;
+};
+
+TEST_F(ExtractorFactoryTest, CreatesTextExtractorForTxtFile) {
+    std::string path = createTestFile("document.txt");
+    auto extractor = ExtractorFactory::create(path);
+
+    EXPECT_NE(extractor, nullptr);
     EXPECT_NE(dynamic_cast<TextExtractor*>(extractor.get()), nullptr);
 }
 
-TEST(ExtractorFactoryTest, ReturnsTextExtractorForTex) {
-    auto extractor = ExtractorFactory::create("foo.tex");
+TEST_F(ExtractorFactoryTest, CreatesTextExtractorForTexFile) {
+    std::string path = createTestFile("document.tex");
+    auto extractor = ExtractorFactory::create(path);
+
+    EXPECT_NE(extractor, nullptr);
     EXPECT_NE(dynamic_cast<TextExtractor*>(extractor.get()), nullptr);
 }
 
-TEST(ExtractorFactoryTest, ReturnsPdfExtractorForPdf) {
-    auto extractor = ExtractorFactory::create("foo.pdf");
+TEST_F(ExtractorFactoryTest, CreatesTextExtractorForFileWithoutExtension) {
+    std::string path = createTestFile("no_extension");
+    auto extractor = ExtractorFactory::create(path);
+
+    EXPECT_NE(extractor, nullptr);
+    EXPECT_NE(dynamic_cast<TextExtractor*>(extractor.get()), nullptr);
+}
+
+TEST_F(ExtractorFactoryTest, CreatesPdfExtractorForPdfFile) {
+    std::string path = createTestFile("document.pdf");
+    auto extractor = ExtractorFactory::create(path);
+
+    EXPECT_NE(extractor, nullptr);
     EXPECT_NE(dynamic_cast<PdfExtractor*>(extractor.get()), nullptr);
 }
 
-TEST(ExtractorFactoryTest, ReturnsTextExtractorForUnknownExtension) {
-    auto extractor = ExtractorFactory::create("foo");
-    EXPECT_NE(dynamic_cast<TextExtractor*>(extractor.get()), nullptr);
+TEST_F(ExtractorFactoryTest, CreatesPdfExtractorForUpperCasePdf) {
+    std::string path = createTestFile("document.PDF");
+    auto extractor = ExtractorFactory::create(path);
+
+    EXPECT_NE(extractor, nullptr);
+}
+
+TEST_F(ExtractorFactoryTest, ReturnsUniquePtrForEachCall) {
+    std::string txtPath = createTestFile("doc1.txt");
+    std::string pdfPath = createTestFile("doc2.pdf");
+    
+    auto extractor1 = ExtractorFactory::create(txtPath);
+    auto extractor2 = ExtractorFactory::create(txtPath);
+
+    EXPECT_NE(extractor1.get(), extractor2.get());
+}
+
+
+TEST(ExtractResultTest, OkCreatesSuccessResult) {
+    ExtractResult result = ExtractResult::ok("Hello");
+
+    EXPECT_TRUE(result.success);
+    EXPECT_EQ(result.content, "Hello");
+    EXPECT_TRUE(result.error_message.empty());
+}
+
+TEST(ExtractResultTest, FailCreatesFailureResult) {
+    ExtractResult result = ExtractResult::fail("Error message");
+
+    EXPECT_FALSE(result.success);
+    EXPECT_TRUE(result.content.empty());
+    EXPECT_EQ(result.error_message, "Error message");
+}
+
+TEST(ExtractResultTest, MoveConstructorWorks) {
+    ExtractResult original = ExtractResult::ok("Content");
+    ExtractResult moved = std::move(original);
+
+    EXPECT_TRUE(moved.success);
+    EXPECT_EQ(moved.content, "Content");
+}
+
+TEST(ExtractResultTest, MoveAssignmentWorks) {
+    ExtractResult original = ExtractResult::ok("Content");
+    ExtractResult target = ExtractResult::fail("Old");
+    target = std::move(original);
+
+    EXPECT_TRUE(target.success);
+    EXPECT_EQ(target.content, "Content");
+}
+
+class IntegrationTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        testDir_ = std::string(TEST_SAMPLE_DATA_DIR) + "/integration";
+        fs::create_directories(testDir_);
+    }
+
+    void TearDown() override {
+        fs::remove_all(testDir_);
+    }
+
+    std::string createTextFile(const std::string& name, const std::string& content) {
+        std::string path = testDir_ + "/" + name;
+        std::ofstream file(path);
+        file << content;
+        file.close();
+        return path;
+    }
+
+    std::string testDir_;
+};
+
+TEST_F(IntegrationTest, FactoryAndTextExtractorWorkTogether) {
+    std::string path = createTextFile("test.txt", "Integration test content");
+    
+    auto extractor = ExtractorFactory::create(path);
+    ExtractResult result = extractor->extract(path);
+
+    EXPECT_TRUE(result.success);
+    EXPECT_EQ(result.content, "Integration test content");
+}
+
+TEST_F(IntegrationTest, FactoryReturnsProperExtractorTypeBasedOnExtension) {
+    std::string txtPath = createTextFile("a.txt", "");
+    std::string texPath = createTextFile("b.tex", "");
+    std::string pdfPath = createTextFile("c.pdf", "");
+    std::string noExtPath = createTextFile("no_ext", "");
+
+    auto txtExtractor = ExtractorFactory::create(txtPath);
+    auto texExtractor = ExtractorFactory::create(texPath);
+    auto pdfExtractor = ExtractorFactory::create(pdfPath);
+    auto noExtExtractor = ExtractorFactory::create(noExtPath);
+
+    EXPECT_NE(dynamic_cast<TextExtractor*>(txtExtractor.get()), nullptr);
+    EXPECT_NE(dynamic_cast<TextExtractor*>(texExtractor.get()), nullptr);
+    EXPECT_NE(dynamic_cast<PdfExtractor*>(pdfExtractor.get()), nullptr);
+    EXPECT_NE(dynamic_cast<TextExtractor*>(noExtExtractor.get()), nullptr);
 }
