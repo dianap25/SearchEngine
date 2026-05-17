@@ -2,6 +2,7 @@ find_package(GTest REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 add_executable(unit_tests
+    test_application.cc
     test_database.cc
     test_extractor.cc
     test_scanner.cc
@@ -11,6 +12,7 @@ add_executable(unit_tests
     test_context_builder.cc
     test_hasher.cc
     test_refresh_engine.cc
+    test_search_result.cc
 
     ../src/IndexService.cc
     ../src/Database.cc
@@ -23,6 +25,7 @@ add_executable(unit_tests
     ../src/ContextBuilder.cc
     ../src/Hasher.cc
     ../src/RefreshEngine.cc
+    ../src/Application.cc
 )
 
 target_include_directories(unit_tests PRIVATE ../include)
